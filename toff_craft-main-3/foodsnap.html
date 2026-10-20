@@ -1,0 +1,3686 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="FoodSnap — a friendly food scanner and healthy eating guide with transparent nutrition estimates." />
+  <meta name="theme-color" content="#22b77a" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+  <title>FoodSnap — AI Food Scanner — Smart Food Scanner</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --green:#22b77a;--green-dark:#12835a;--green-pale:#e9fbf3;
+      --ink:#17221d;--muted:#66736d;--bg:#f5faf7;--card:#fff;
+      --line:#dfebe5;--orange:#f59e0b;--blue:#4f7ee8;--shadow:0 18px 50px rgba(23,34,29,.08);
+      --radius:22px
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.55}
+    button,input,select{font:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .container{max-width:1180px;margin:auto;padding:0 24px}
+    nav{position:sticky;top:0;z-index:50;height:72px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+    .nav-inner{height:100%;display:flex;align-items:center;justify-content:space-between}
+    .brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-weight:900;font-size:21px}
+    .brand-icon{width:40px;height:40px;border-radius:12px;background:var(--green);display:grid;place-items:center;font-size:21px;box-shadow:0 8px 22px rgba(34,183,122,.25)}
+    .nav-links{display:flex;align-items:center;gap:25px}
+    .nav-links a{text-decoration:none;color:var(--muted);font-size:14px;font-weight:700}
+    .nav-links a:hover{color:var(--green-dark)}
+    .nav-cta{border:0;background:var(--ink);color:#fff;border-radius:12px;padding:10px 16px;font-weight:800}
+    .hero{display:grid;grid-template-columns:1fr 1fr;gap:65px;align-items:center;padding:76px 0 62px}
+    .eyebrow,.tag{display:inline-flex;align-items:center;gap:7px;background:var(--green-pale);color:var(--green-dark);border-radius:999px;padding:7px 12px;font-size:11px;font-weight:900;letter-spacing:.7px;text-transform:uppercase}
+    h1{font-size:clamp(42px,5vw,68px);line-height:1.03;letter-spacing:-3px;margin:18px 0 22px}
+    h1 span{color:var(--green)}
+    .hero-copy{color:var(--muted);font-size:17px;max-width:560px;margin-bottom:28px}
+    .features{display:flex;gap:18px;flex-wrap:wrap}
+    .feature{display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;color:#4f5e57}
+    .check{width:22px;height:22px;border-radius:50%;background:var(--green-pale);color:var(--green-dark);display:grid;place-items:center;font-size:12px}
+    .scanner{background:var(--card);border:1px solid var(--line);padding:14px;border-radius:30px;box-shadow:var(--shadow)}
+    .scanner-inner{min-height:450px;border:2px dashed #cfe4d9;border-radius:22px;background:radial-gradient(circle at 25% 20%,rgba(34,183,122,.09),transparent 28%),#f9fcfa;display:flex;align-items:center;justify-content:center;text-align:center;padding:28px;overflow:hidden}
+    .camera-icon{width:78px;height:78px;border-radius:24px;background:var(--green-pale);display:grid;place-items:center;font-size:36px;margin:0 auto 18px}
+    .scanner h2{font-size:23px;margin-bottom:7px}
+    .scanner p{color:var(--muted);font-size:14px;max-width:340px;margin:0 auto 20px}
+    .buttons{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+    .primary,.secondary{border-radius:13px;padding:13px 19px;font-weight:850;border:0}
+    .primary{background:var(--green);color:#fff;box-shadow:0 9px 20px rgba(34,183,122,.2)}
+    .primary:hover{background:var(--green-dark);transform:translateY(-1px)}
+    .secondary{background:#fff;border:1px solid var(--line);color:var(--ink)}
+    .secondary:hover{border-color:var(--green)}
+    #fileInput{display:none}
+    #previewArea{display:none;width:100%}
+    #foodImage{width:100%;height:290px;object-fit:cover;border-radius:17px;display:block;margin-bottom:13px}
+    .analyze{width:100%;border:0;border-radius:12px;background:var(--ink);color:#fff;padding:14px;font-weight:850}
+    .loading{display:none}
+    .spinner{width:36px;height:36px;border:4px solid #dceee7;border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 12px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .notice{font-size:12px;color:var(--muted);margin-top:13px;text-align:center}
+    section{scroll-margin-top:90px}
+    .results{display:none;padding:10px 0 78px}
+    .section-head{display:flex;justify-content:space-between;align-items:end;gap:18px;margin-bottom:22px}
+    .section-label{color:var(--green-dark);text-transform:uppercase;letter-spacing:1.5px;font-size:11px;font-weight:900;margin-bottom:5px}
+    .section-head h2{font-size:31px;letter-spacing:-1px}
+    .estimate-badge{padding:8px 12px;border-radius:10px;background:#fff8e7;color:#9a6500;font-size:12px;font-weight:850;border:1px solid #f8dfaa}
+    .result-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:20px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:24px;box-shadow:0 8px 28px rgba(23,34,29,.04)}
+    .food-name{font-size:29px;margin-bottom:4px}
+    .food-description{color:var(--muted);font-size:14px;margin-bottom:18px}
+    .nutrition{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+    .nutrition-box{padding:15px 9px;background:#f7faf8;border-radius:14px;text-align:center}
+    .nutrition-value{display:block;font-size:20px;font-weight:900}
+    .nutrition-label{color:var(--muted);font-size:11px;font-weight:650}
+    .range-note{font-size:12px;color:var(--muted);margin-top:12px}
+    .ingredients{margin-top:20px}
+    .ingredients h3,.details h3{font-size:15px;margin-bottom:11px}
+    .ingredient-list{display:flex;flex-wrap:wrap;gap:7px}
+    .ingredient{background:var(--green-pale);color:#247958;padding:6px 9px;border-radius:8px;font-size:12px;font-weight:750}
+    .details{display:grid;gap:13px}
+    .info-line{display:flex;justify-content:space-between;gap:15px;padding-bottom:11px;border-bottom:1px solid var(--line);font-size:13px}
+    .info-line span:first-child{color:var(--muted)}
+    .info-line span:last-child{font-weight:800;text-align:right}
+    .accuracy-box{margin-top:17px;padding:14px;border-radius:14px;background:#f6f9ff;border:1px solid #dfe7fb;color:#465b8c;font-size:12px}
+    .accuracy-box strong{display:block;margin-bottom:4px}
+    .how,.reset-section{background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:78px 0}
+    .center{text-align:center}
+    .center .section-label{margin-bottom:5px}
+    .center h2{font-size:34px;letter-spacing:-1px}
+    .subtitle{color:var(--muted);max-width:650px;margin:9px auto 40px}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+    .step{padding:27px 20px;border:1px solid var(--line);border-radius:19px;text-align:center}
+    .step-number{width:44px;height:44px;margin:0 auto 15px;border-radius:13px;background:var(--green-pale);color:var(--green-dark);display:grid;place-items:center;font-weight:900}
+    .step h3{font-size:17px;margin-bottom:6px}.step p{color:var(--muted);font-size:13px}
+    .reset-wrap{max-width:1040px;margin:auto}
+    .reset-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:30px}
+    .plan-card{border:1px solid var(--line);border-radius:20px;padding:23px;background:#fff}
+    .plan-card h3{font-size:19px;margin-bottom:7px}
+    .plan-card>p{color:var(--muted);font-size:13px;margin-bottom:16px}
+    .habit{display:flex;gap:11px;padding:12px 0;border-top:1px solid var(--line);font-size:13px}
+    .habit-icon{width:28px;height:28px;border-radius:9px;background:var(--green-pale);display:grid;place-items:center;flex:none}
+    .habit strong{display:block;margin-bottom:2px}.habit span{color:var(--muted)}
+    .warning{margin-top:20px;padding:15px 16px;background:#fff8e8;border:1px solid #f2dfb0;border-radius:15px;color:#765719;font-size:12px}
+    .history{padding:78px 0}
+    .history-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+    .history-head h2{font-size:30px;letter-spacing:-1px}
+    .scans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+    .scan-card{background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden}
+    .scan-photo{height:155px;display:grid;place-items:center;font-size:56px;background:linear-gradient(135deg,#edf8f3,#fff8e9)}
+    .scan-content{padding:15px}.scan-content h3{font-size:16px;margin-bottom:2px}.scan-content p{font-size:12px;color:var(--muted)}
+    footer{padding:28px 24px;text-align:center;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+    .modal-backdrop{display:none;position:fixed;inset:0;background:rgba(10,20,15,.45);z-index:100;align-items:center;justify-content:center;padding:20px}
+    .modal{max-width:520px;width:100%;background:#fff;border-radius:22px;padding:25px;box-shadow:0 30px 80px rgba(0,0,0,.2)}
+    .modal h2{font-size:22px;margin-bottom:8px}.modal p{font-size:13px;color:var(--muted);margin-bottom:18px}
+    .modal label{display:block;font-size:12px;font-weight:800;margin:12px 0 6px}
+    .modal select{width:100%;padding:11px;border:1px solid var(--line);border-radius:11px;background:#fff}
+    .modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:20px}
+    .close{background:#fff;border:1px solid var(--line);padding:10px 15px;border-radius:11px;font-weight:750}
+
+    /* ACCOUNT / AUTH */
+    .account-panel{display:none;position:fixed;inset:0;background:rgba(10,20,15,.5);z-index:200;align-items:center;justify-content:center;padding:18px}
+    .account-card{width:min(520px,100%);max-height:92vh;overflow:auto;background:#fff;border-radius:24px;padding:25px;box-shadow:0 30px 90px rgba(0,0,0,.22)}
+    .account-top{display:flex;justify-content:space-between;gap:15px;align-items:flex-start;margin-bottom:20px}
+    .account-top h2{font-size:24px;letter-spacing:-.6px}
+    .account-close{border:0;background:#f4f7f5;width:34px;height:34px;border-radius:10px;font-size:23px;color:var(--muted)}
+    .auth-tabs{display:grid;grid-template-columns:1fr 1fr;background:#f3f7f5;padding:4px;border-radius:12px;margin-bottom:20px}
+    .auth-tab{border:0;background:transparent;border-radius:9px;padding:10px;font-weight:800;color:var(--muted)}
+    .auth-tab.active{background:#fff;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .account-card label{display:block;font-size:12px;font-weight:850;margin:12px 0 6px}
+    .account-card input{width:100%;padding:12px 13px;border:1px solid var(--line);border-radius:11px;outline:none;background:#fff}
+    .account-card input:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(34,183,122,.1)}
+    .account-submit{width:100%;margin-top:18px}
+    .auth-note{font-size:11px!important;color:var(--muted);margin-top:12px;line-height:1.5}
+    .auth-message{display:none;margin-top:14px;padding:11px 13px;border-radius:10px;background:#fff4f4;color:#9a3c3c;font-size:12px;font-weight:700}
+    .account-user{display:flex;align-items:center;gap:12px;background:var(--green-pale);padding:15px;border-radius:15px;margin-bottom:14px}
+    .account-avatar{width:40px;height:40px;border-radius:12px;background:#fff;display:grid;place-items:center}
+    .account-user strong,.account-user span{display:block}.account-user span{font-size:11px;color:var(--muted);margin-top:2px}
+    .security-box{display:flex;justify-content:space-between;gap:15px;align-items:center;border:1px solid var(--line);border-radius:15px;padding:14px;margin-top:10px}
+    .security-box strong{font-size:13px}.security-box p{font-size:11px;color:var(--muted);margin-top:3px;max-width:310px}
+    .small-btn{padding:9px 12px!important;white-space:nowrap}
+    .logout-btn{width:100%;border:1px solid #ffd2d2;background:#fff6f6;color:#9b3f3f;border-radius:11px;padding:11px;margin-top:14px;font-weight:800}
+
+    @media(max-width:850px){
+      .hero,.result-grid,.reset-grid{grid-template-columns:1fr}.hero{padding-top:48px;gap:38px}
+      .steps,.scans{grid-template-columns:1fr}.nav-links a{display:none}
+    }
+    @media(max-width:520px){
+      .account-card{padding:20px}.security-box{align-items:flex-start;flex-direction:column}.small-btn{width:100%}
+      .container{padding:0 18px}.hero{padding-left:0;padding-right:0}.nutrition{grid-template-columns:repeat(2,1fr)}
+      .section-head{align-items:start;flex-direction:column}.nav-cta{padding:9px 12px}.hero h1{font-size:44px}
+    }
+  
+/* Premium */
+.price-badge,.premium-active{display:inline-flex;align-items:center;padding:7px 11px;border-radius:999px;background:#eaf8ee;color:#13733a;font-weight:800;font-size:.82rem}
+.premium-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.premium-card{border:1px solid rgba(26,150,79,.24);box-shadow:0 12px 35px rgba(20,90,50,.08)}
+.feature-list{padding-left:20px;display:grid;gap:12px;line-height:1.5}
+.feature-list li::marker{color:#20a45a}
+.plan-row{display:grid;grid-template-columns:145px 1fr;gap:12px;padding:13px 0;border-bottom:1px solid #edf2ef}
+.plan-row:last-child{border-bottom:0}
+.plan-row span:first-child{font-weight:800}
+.premium-results{margin-top:18px;border:1px solid rgba(26,150,79,.25)}
+.premium-result-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.premium-plan-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:16px}
+.premium-plan-item{padding:16px;border:1px solid #e4ebe7;border-radius:16px;background:#fbfdfc}
+.premium-plan-item h4{margin:0 0 7px}
+.note-box{margin-top:16px;padding:14px;border-radius:14px;background:#fff8e8;border:1px solid #f0dfad;line-height:1.5}
+.checkout-list{display:grid;gap:9px;margin:12px 0 18px;padding-left:20px}
+.checkout-total{display:flex;justify-content:space-between;font-size:1.15rem;font-weight:900;padding:13px 0;border-top:1px solid #e5ebe7}
+@media (max-width:760px){
+  .premium-grid,.premium-plan-grid{grid-template-columns:1fr}
+  .plan-row{grid-template-columns:1fr}
+  .premium-result-head{align-items:flex-start;flex-direction:column}
+}
+
+
+/* FoodSnap polished interface layer */
+:root{
+  --fs-green:#18a957;
+  --fs-green-dark:#087a3d;
+  --fs-ink:#14251c;
+  --fs-muted:#68776f;
+  --fs-line:#e7eee9;
+  --fs-surface:#ffffff;
+  --fs-soft:#f3faf5;
+  --fs-shadow:0 18px 50px rgba(19,62,39,.09);
+  --fs-shadow-sm:0 8px 24px rgba(19,62,39,.07);
+}
+html{scroll-behavior:smooth}
+body{
+  background:
+    radial-gradient(circle at 85% 0%, rgba(43,183,101,.08), transparent 28rem),
+    linear-gradient(180deg,#fbfefc 0%,#f7faf8 100%);
+  color:var(--fs-ink);
+  letter-spacing:-.01em;
+}
+nav,.nav,.navbar{
+  backdrop-filter:blur(16px);
+  -webkit-backdrop-filter:blur(16px);
+  background:rgba(255,255,255,.84)!important;
+  border-bottom:1px solid rgba(225,235,228,.8);
+}
+button,.btn{
+  border-radius:13px!important;
+  min-height:44px;
+  font-weight:800!important;
+  transition:transform .18s ease,box-shadow .18s ease,background .18s ease,border-color .18s ease;
+}
+button:hover,.btn:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(20,100,55,.12)}
+.btn-primary{
+  background:linear-gradient(135deg,#1db35e,#0d8d47)!important;
+  border:0!important;
+  box-shadow:0 8px 20px rgba(16,155,76,.2);
+}
+.btn-outline{
+  background:rgba(255,255,255,.86)!important;
+  border:1px solid #dce8e0!important;
+}
+.card,.result-card,.scanner-card,.feature-card{
+  border:1px solid rgba(222,233,226,.9)!important;
+  border-radius:22px!important;
+  box-shadow:var(--fs-shadow-sm)!important;
+}
+.card{background:rgba(255,255,255,.94)}
+.section{scroll-margin-top:90px}
+.eyebrow{
+  letter-spacing:.11em;
+  font-weight:900;
+  color:var(--fs-green-dark);
+}
+h1,h2,h3{letter-spacing:-.035em}
+h1{font-size:clamp(2.25rem,5vw,4.3rem);line-height:.98}
+h2{font-size:clamp(1.75rem,3vw,2.6rem)}
+.muted{color:var(--fs-muted)!important}
+input,select{
+  min-height:46px;
+  border-radius:12px!important;
+  border:1px solid #dce7df!important;
+  background:#fff!important;
+  outline:none;
+}
+input:focus,select:focus{
+  border-color:#39b96f!important;
+  box-shadow:0 0 0 4px rgba(38,180,99,.11);
+}
+.premium-estimate-gate{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin:12px 0 16px;
+  padding:14px 16px;
+  border:1px solid #d9eadf;
+  border-radius:18px;
+  background:linear-gradient(135deg,#f2fbf5,#fff);
+  box-shadow:0 8px 22px rgba(18,91,47,.06);
+}
+.gate-icon{
+  width:38px;height:38px;display:grid;place-items:center;
+  flex:0 0 38px;border-radius:12px;
+  background:#e2f7e9;color:#0a8c45;font-weight:900;
+}
+.premium-estimate-gate strong{display:block;margin-bottom:2px}
+.premium-estimate-gate p{margin:0;color:#6b796f;font-size:.9rem;line-height:1.4}
+.btn-small{min-height:38px!important;padding:8px 13px!important;font-size:.86rem!important;white-space:nowrap}
+.premium-mini-badge{
+  display:inline-flex;align-items:center;
+  margin-left:6px;padding:3px 7px;border-radius:999px;
+  background:#e6f7ec;color:#08753a;font-size:.66rem;font-weight:900;
+  letter-spacing:.04em;
+}
+.lock-icon{font-size:.9em}
+#improveEstimateBtn{
+  position:relative;
+  border:1px solid #cfe7d8!important;
+  background:#f6fcf8!important;
+  color:#087a3d!important;
+}
+#improveEstimateBtn:disabled{opacity:.75;cursor:not-allowed}
+.price-badge{
+  box-shadow:inset 0 0 0 1px rgba(24,169,87,.06);
+}
+.premium-card{
+  position:relative;
+  overflow:hidden;
+}
+.premium-card:before{
+  content:"";
+  position:absolute;right:-70px;top:-70px;
+  width:180px;height:180px;border-radius:50%;
+  background:rgba(39,181,98,.08);
+}
+.premium-active{box-shadow:0 4px 14px rgba(19,150,76,.12)}
+.premium-plan-item{
+  transition:transform .18s ease,box-shadow .18s ease;
+}
+.premium-plan-item:hover{
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(20,80,45,.07);
+}
+.modal-backdrop{
+  background:rgba(10,24,16,.48)!important;
+  backdrop-filter:blur(7px);
+  -webkit-backdrop-filter:blur(7px);
+}
+.modal{
+  border:1px solid rgba(222,235,226,.95)!important;
+  border-radius:24px!important;
+  box-shadow:0 30px 90px rgba(10,35,20,.22)!important;
+}
+.modal-close{
+  width:38px!important;height:38px!important;min-height:38px!important;
+  border-radius:50%!important;
+}
+@media(max-width:700px){
+  .premium-estimate-gate{align-items:flex-start;flex-wrap:wrap}
+  .premium-estimate-gate .btn{width:100%}
+  nav,.nav,.navbar{padding-left:14px!important;padding-right:14px!important}
+}
+
+
+/* Interactive hover effects */
+.card,
+.result-card,
+.feature-card,
+.scanner-card,
+.premium-plan-item,
+.history-card,
+.stat-card{
+  transform-origin:center;
+  transition:
+    transform .22s cubic-bezier(.2,.8,.2,1),
+    box-shadow .22s ease,
+    border-color .22s ease;
+}
+.card:hover,
+.result-card:hover,
+.feature-card:hover,
+.scanner-card:hover,
+.premium-plan-item:hover,
+.history-card:hover,
+.stat-card:hover{
+  transform:translateY(-6px) scale(1.025);
+  box-shadow:0 18px 38px rgba(18,72,42,.13)!important;
+  border-color:rgba(39,174,96,.28)!important;
+}
+button:hover,.btn:hover{
+  transform:translateY(-2px) scale(1.015)!important;
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    scroll-behavior:auto!important;
+    transition:none!important;
+  }
+  .card:hover,.result-card:hover,.feature-card:hover,.scanner-card:hover,
+  .premium-plan-item:hover,.history-card:hover,.stat-card:hover,
+  button:hover,.btn:hover{
+    transform:none!important;
+  }
+}
+
+
+.app-download-section{padding-top:30px}
+.app-download-card{
+  position:relative;
+  overflow:hidden;
+  display:grid;
+  grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);
+  gap:32px;
+  align-items:center;
+  padding:34px;
+  border:1px solid #dceae1;
+  border-radius:28px;
+  background:
+    radial-gradient(circle at 88% 18%,rgba(41,184,98,.14),transparent 18rem),
+    linear-gradient(135deg,#f5fcf7,#ffffff);
+  box-shadow:0 20px 55px rgba(20,75,42,.09);
+}
+.app-copy h2{max-width:650px;margin:8px 0 12px}
+.app-copy>p{max-width:700px;color:#65736a;line-height:1.65}
+.app-benefits{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin:22px 0;
+}
+.app-benefits>div{
+  display:grid;
+  grid-template-columns:26px 1fr;
+  column-gap:8px;
+  padding:14px;
+  border:1px solid #e2ece5;
+  border-radius:16px;
+  background:rgba(255,255,255,.76);
+}
+.app-benefits span{grid-row:1 / span 2;color:#10934b;font-weight:900}
+.app-benefits strong{font-size:.94rem}
+.app-benefits small{grid-column:2;color:#718078;line-height:1.4;margin-top:3px}
+.app-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.phone-preview{display:flex;justify-content:center}
+.phone-frame{
+  width:245px;
+  height:475px;
+  padding:9px;
+  border-radius:34px;
+  background:#14241b;
+  box-shadow:0 28px 60px rgba(12,45,25,.25);
+  transform:rotate(2deg);
+  transition:transform .3s ease;
+}
+.app-download-card:hover .phone-frame{transform:rotate(0deg) translateY(-5px) scale(1.025)}
+.phone-speaker{width:75px;height:18px;border-radius:20px;background:#09110d;margin:0 auto 6px}
+.phone-screen{
+  height:calc(100% - 24px);
+  border-radius:26px;
+  background:linear-gradient(180deg,#f7fcf8,#eef8f1);
+  padding:19px 14px 12px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.mini-app-top{display:flex;justify-content:space-between;font-weight:900;color:#08783d}
+.mini-greeting{font-size:1.25rem;font-weight:900;margin-top:4px}
+.mini-score{font-size:.78rem;color:#6c7c73}
+.mini-bar{height:8px;background:#dcebe1;border-radius:20px;overflow:hidden}
+.mini-bar span{display:block;width:78%;height:100%;background:#1bab5b;border-radius:20px}
+.mini-card{
+  padding:13px;
+  border-radius:15px;
+  background:#fff;
+  border:1px solid #e0ebe3;
+  box-shadow:0 5px 14px rgba(24,77,44,.06);
+}
+.mini-card b{display:block;font-size:.8rem}
+.mini-card small{display:block;color:#758179;line-height:1.35;margin-top:4px;font-size:.68rem}
+.mini-pills{display:flex;gap:4px;margin-top:9px}
+.mini-pills i{
+  font-style:normal;font-size:.57rem;font-weight:800;
+  padding:4px 6px;border-radius:999px;background:#eaf7ee;color:#167440
+}
+.mini-nav{
+  margin-top:auto;
+  display:flex;
+  justify-content:space-around;
+  font-size:.63rem;
+  font-weight:800;
+  color:#65746b;
+  padding-top:8px;
+  border-top:1px solid #dfeae2;
+}
+@media(max-width:800px){
+  .app-download-card{grid-template-columns:1fr;padding:25px}
+  .phone-preview{order:-1}
+  .app-benefits{grid-template-columns:1fr}
+}
+
+
+/* AI Coach */
+.ai-coach-section{padding-top:28px}
+.ai-coach-card{
+  position:relative;
+  overflow:hidden;
+  max-width:1000px;
+  margin:0 auto;
+  padding:30px;
+  border-radius:28px;
+  border:1px solid #dcebe1;
+  background:
+    radial-gradient(circle at 92% 5%,rgba(36,180,96,.13),transparent 19rem),
+    linear-gradient(145deg,#ffffff,#f4fbf6);
+  box-shadow:0 22px 60px rgba(17,75,40,.09);
+}
+.coach-header{
+  display:flex;
+  justify-content:space-between;
+  gap:25px;
+  align-items:center;
+}
+.coach-header h2{margin:8px 0 8px}
+.coach-header p{max-width:700px;line-height:1.6}
+.coach-orb{
+  width:82px;height:82px;flex:0 0 82px;
+  display:grid;place-items:center;
+  border-radius:25px;
+  font-size:2.5rem;
+  background:linear-gradient(135deg,#e1f8e9,#c9f0d7);
+  box-shadow:0 15px 35px rgba(25,150,75,.14);
+}
+.coach-disclaimer{
+  margin:20px 0;
+  padding:14px 16px;
+  border-radius:16px;
+  border:1px solid #e4e8d4;
+  background:#fffbea;
+  color:#5f644f;
+  line-height:1.5;
+  font-size:.9rem;
+}
+.coach-chat{
+  min-height:170px;
+  max-height:350px;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  padding:16px;
+  border-radius:20px;
+  background:#f4f8f5;
+  border:1px solid #e2ebe5;
+}
+.coach-message{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  max-width:88%;
+  padding:13px 15px;
+  border-radius:17px;
+  line-height:1.5;
+}
+.coach-message p{margin:4px 0 0}
+.coach-ai{background:#fff;border:1px solid #e1eae4}
+.coach-user{
+  align-self:flex-end;
+  background:#dff5e7;
+  border:1px solid #c7ead3;
+}
+.message-avatar{
+  width:30px;height:30px;flex:0 0 30px;
+  display:grid;place-items:center;
+  border-radius:10px;
+  background:#e7f7ec;
+}
+.coach-prompts{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin:14px 0;
+}
+.coach-prompt{
+  min-height:38px!important;
+  padding:8px 12px!important;
+  border-radius:999px!important;
+  background:#fff!important;
+  border:1px solid #dce9e0!important;
+  color:#1a5e39;
+  font-size:.82rem;
+}
+.coach-input-row{display:grid;grid-template-columns:1fr auto;gap:10px}
+#coachInput{
+  resize:vertical;
+  min-height:70px;
+  padding:13px;
+  font:inherit;
+}
+#coachSendBtn{align-self:stretch}
+.coach-status{margin-top:10px}
+@media(max-width:700px){
+  .ai-coach-card{padding:20px}
+  .coach-header{align-items:flex-start}
+  .coach-orb{width:58px;height:58px;flex-basis:58px;font-size:1.8rem;border-radius:18px}
+  .coach-input-row{grid-template-columns:1fr}
+  .coach-message{max-width:96%}
+}
+
+
+/* Professional interaction and transition system */
+:root{
+  --pro-green:#138a48;
+  --pro-green-2:#22ad62;
+  --pro-ink:#102219;
+  --pro-muted:#6b7971;
+  --pro-border:#dfe9e3;
+  --pro-bg:#f6faf7;
+  --pro-shadow:0 20px 60px rgba(14,57,33,.10);
+  --pro-ease:cubic-bezier(.2,.75,.2,1);
+}
+*{box-sizing:border-box}
+body{
+  overflow-x:hidden;
+  background:
+    radial-gradient(circle at 10% 0%,rgba(39,184,99,.07),transparent 25rem),
+    radial-gradient(circle at 95% 15%,rgba(39,184,99,.06),transparent 25rem),
+    #f8fbf9;
+}
+section{
+  animation:sectionIn .55s var(--pro-ease) both;
+}
+@keyframes sectionIn{
+  from{opacity:0;transform:translateY(12px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.card,.result-card,.feature-card,.scanner-card,.premium-plan-item,
+.history-card,.stat-card,.ai-coach-card,.workout-shell{
+  transition:transform .28s var(--pro-ease),box-shadow .28s var(--pro-ease),border-color .28s ease;
+}
+.card:hover,.result-card:hover,.feature-card:hover,.scanner-card:hover,
+.premium-plan-item:hover,.history-card:hover,.stat-card:hover{
+  transform:translateY(-6px) scale(1.02);
+  box-shadow:0 22px 45px rgba(16,73,40,.12)!important;
+}
+button,.btn{
+  transition:transform .2s var(--pro-ease),box-shadow .2s ease,background .2s ease,border-color .2s ease,opacity .2s ease;
+}
+button:hover,.btn:hover{transform:translateY(-2px)}
+button:active,.btn:active{transform:translateY(0) scale(.98)}
+input,select,textarea{
+  transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+}
+input:focus,select:focus,textarea:focus{
+  transform:translateY(-1px);
+}
+.ai-coach-card,.workout-shell{
+  border:1px solid var(--pro-border);
+  box-shadow:var(--pro-shadow);
+}
+.workout-coach-section{padding-top:30px}
+.workout-shell{
+  max-width:1100px;
+  margin:0 auto;
+  padding:30px;
+  border-radius:30px;
+  background:
+    radial-gradient(circle at 90% 0%,rgba(39,183,98,.11),transparent 20rem),
+    linear-gradient(145deg,#fff,#f4faf6);
+}
+.workout-hero{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:25px;
+  padding-bottom:25px;
+  border-bottom:1px solid #e5eee8;
+}
+.workout-hero h2{margin:8px 0}
+.workout-hero p{max-width:700px;line-height:1.6}
+.workout-badge{
+  min-width:185px;
+  padding:16px;
+  border:1px solid #cfe8d8;
+  border-radius:18px;
+  background:#f0faf4;
+}
+.workout-badge span{font-size:1.25rem;color:#138a48}
+.workout-badge strong,.workout-badge small{display:block}
+.workout-badge small{color:#6c7a72;margin-top:3px}
+.premium-lock-panel{
+  margin:22px 0;
+  padding:17px;
+  border:1px solid #d9e8df;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  background:rgba(255,255,255,.8);
+}
+.premium-lock-panel h3{margin:0 0 3px}
+.premium-lock-panel p{margin:0;color:#6c7971;line-height:1.45}
+.lock-circle{
+  width:44px;height:44px;flex:0 0 44px;
+  display:grid;place-items:center;
+  border-radius:14px;background:#e2f6e9;color:#0c8745;font-weight:900;
+}
+.premium-lock-panel .btn{margin-left:auto;white-space:nowrap}
+.form-title,.result-top{
+  display:flex;align-items:center;justify-content:space-between;gap:15px;
+}
+.form-title h3,.result-top h3{margin:6px 0 0}
+.step-pill,.plan-ready{
+  padding:6px 10px;border-radius:999px;
+  background:#e9f7ee;color:#12733d;
+  font-size:.7rem;font-weight:900;letter-spacing:.05em;
+}
+.form-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:15px;
+  margin-top:20px;
+}
+.form-grid label,.equipment-label{display:grid;gap:7px}
+.form-grid label>span,.equipment-label>span{font-weight:800;font-size:.85rem}
+.equipment-label{margin-top:15px}
+.workout-note{
+  margin:16px 0;
+  padding:14px 16px;
+  border-radius:16px;
+  background:#fffbea;
+  border:1px solid #ece3bd;
+  color:#65644f;
+  line-height:1.5;
+  font-size:.88rem;
+}
+.generate-workout-btn{margin-top:5px;width:100%}
+.workout-result-card{
+  margin-top:20px;
+  padding:23px;
+  border:1px solid #d9e8df;
+  border-radius:22px;
+  background:#fff;
+}
+.workout-days-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:13px;
+  margin-top:16px;
+}
+.workout-day{
+  padding:17px;
+  border:1px solid #e1ebe5;
+  border-radius:17px;
+  background:#fbfdfb;
+  animation:dayIn .45s var(--pro-ease) both;
+}
+.workout-day:nth-child(2){animation-delay:.05s}
+.workout-day:nth-child(3){animation-delay:.1s}
+.workout-day:nth-child(4){animation-delay:.15s}
+.workout-day:nth-child(5){animation-delay:.2s}
+@keyframes dayIn{
+  from{opacity:0;transform:translateY(8px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.workout-day h4{margin:0 0 8px}
+.workout-day ul{margin:0;padding-left:20px;line-height:1.55}
+.workout-day .day-tag{
+  display:inline-block;margin-bottom:8px;
+  padding:4px 8px;border-radius:999px;
+  background:#edf8f1;color:#17713e;
+  font-size:.68rem;font-weight:900;
+}
+.workout-footer-note{
+  margin-top:15px;padding:13px 15px;
+  border-radius:14px;background:#f4f8f5;
+  color:#65736b;line-height:1.5;font-size:.85rem;
+}
+@media(max-width:760px){
+  .workout-shell{padding:20px}
+  .workout-hero{align-items:flex-start;flex-direction:column}
+  .workout-badge{width:100%}
+  .premium-lock-panel{align-items:flex-start;flex-wrap:wrap}
+  .premium-lock-panel .btn{width:100%;margin-left:0}
+  .form-grid,.workout-days-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+
+
+/* ===== Premium button system ===== */
+:root{
+  --btn-green:#159653;
+  --btn-green-dark:#08763c;
+  --btn-green-light:#e9f8ef;
+  --btn-ink:#163024;
+  --btn-border:#d8e7de;
+}
+
+/* Base */
+button,.btn{
+  position:relative;
+  isolation:isolate;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  min-height:46px!important;
+  padding:11px 18px!important;
+  border-radius:14px!important;
+  border:1px solid transparent!important;
+  font-family:inherit!important;
+  font-size:.9rem!important;
+  font-weight:850!important;
+  letter-spacing:-.01em!important;
+  cursor:pointer!important;
+  overflow:hidden;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  transition:
+    transform .22s cubic-bezier(.2,.8,.2,1),
+    box-shadow .22s ease,
+    border-color .22s ease,
+    background .22s ease,
+    color .22s ease,
+    opacity .22s ease!important;
+}
+
+/* Soft light sweep on hover */
+button::after,.btn::after{
+  content:"";
+  position:absolute;
+  z-index:-1;
+  top:-80%;
+  left:-110%;
+  width:70%;
+  height:260%;
+  transform:rotate(22deg);
+  background:rgba(255,255,255,.22);
+  transition:left .55s ease;
+  pointer-events:none;
+}
+button:hover::after,.btn:hover::after{left:150%}
+
+/* Primary */
+.btn-primary{
+  color:#fff!important;
+  background:linear-gradient(135deg,#1db261 0%,#0b8b46 100%)!important;
+  border-color:#108b48!important;
+  box-shadow:
+    0 7px 16px rgba(14,143,72,.18),
+    inset 0 1px 0 rgba(255,255,255,.18)!important;
+}
+.btn-primary:hover{
+  transform:translateY(-3px) scale(1.015)!important;
+  box-shadow:
+    0 13px 27px rgba(14,143,72,.25),
+    inset 0 1px 0 rgba(255,255,255,.2)!important;
+}
+.btn-primary:active{
+  transform:translateY(0) scale(.975)!important;
+  box-shadow:0 5px 12px rgba(14,143,72,.17)!important;
+}
+
+/* Outline */
+.btn-outline{
+  color:#175a37!important;
+  background:rgba(255,255,255,.92)!important;
+  border-color:#d5e5dc!important;
+  box-shadow:0 4px 12px rgba(18,65,39,.05)!important;
+}
+.btn-outline:hover{
+  color:#08763c!important;
+  background:#f0faf4!important;
+  border-color:#a9d7ba!important;
+  transform:translateY(-3px)!important;
+  box-shadow:0 10px 22px rgba(18,86,46,.1)!important;
+}
+.btn-outline:active{
+  transform:translateY(0) scale(.975)!important;
+}
+
+/* Premium buttons */
+#premiumNavBtn,
+#workoutCoachNavBtn{
+  border-color:#bfe2cc!important;
+  background:linear-gradient(135deg,#f5fcf7,#eaf8ef)!important;
+  color:#08743b!important;
+}
+#premiumNavBtn:hover,
+#workoutCoachNavBtn:hover{
+  border-color:#7fc49a!important;
+  background:linear-gradient(135deg,#ecfaef,#ddf4e5)!important;
+  box-shadow:0 10px 24px rgba(16,137,70,.13)!important;
+}
+
+/* Premium badge */
+.premium-mini-badge{
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  min-height:19px!important;
+  padding:3px 7px!important;
+  border-radius:999px!important;
+  background:linear-gradient(135deg,#dff7e7,#c9eed6)!important;
+  color:#08733a!important;
+  border:1px solid #bde2c9!important;
+  font-size:.61rem!important;
+  font-weight:950!important;
+  letter-spacing:.055em!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.8)!important;
+}
+
+/* Small buttons */
+.btn-small{
+  min-height:40px!important;
+  padding:9px 14px!important;
+  border-radius:12px!important;
+  font-size:.82rem!important;
+}
+
+/* Locked Improve Estimate */
+#improveEstimateBtn.premium-locked{
+  color:#08763c!important;
+  background:linear-gradient(135deg,#f5fcf7,#e9f7ee)!important;
+  border-color:#c7e4d1!important;
+  box-shadow:0 5px 15px rgba(17,108,56,.07)!important;
+}
+#improveEstimateBtn.premium-locked:hover{
+  background:linear-gradient(135deg,#eaf8ef,#dff3e6)!important;
+  border-color:#9dccae!important;
+}
+
+/* AI coach prompt pills */
+.coach-prompt{
+  min-height:39px!important;
+  padding:8px 13px!important;
+  border-radius:999px!important;
+  color:#175d39!important;
+  background:#fff!important;
+  border:1px solid #dbe8e0!important;
+  box-shadow:0 3px 9px rgba(18,70,40,.04)!important;
+}
+.coach-prompt:hover{
+  color:#08753b!important;
+  background:#effaf3!important;
+  border-color:#acd9bb!important;
+  transform:translateY(-2px) scale(1.015)!important;
+  box-shadow:0 8px 17px rgba(18,92,48,.1)!important;
+}
+
+/* App / special actions */
+#downloadAppBtn{
+  min-height:50px!important;
+  padding-left:20px!important;
+  padding-right:20px!important;
+}
+#downloadAppBtn::before{
+  content:"↓";
+  width:22px;height:22px;
+  display:inline-grid;place-items:center;
+  border-radius:7px;
+  background:rgba(255,255,255,.16);
+  font-size:1rem;
+  font-weight:950;
+}
+#coachSendBtn{
+  min-width:145px;
+}
+#generateWorkoutBtn{
+  min-height:51px!important;
+  font-size:.94rem!important;
+}
+#generateWorkoutBtn::before{
+  content:"✦";
+  font-size:1rem;
+}
+
+/* Unlock cards */
+#unlockWorkoutBtn,#openEstimatePremiumBtn{
+  background:linear-gradient(135deg,#1db261,#0b8845)!important;
+}
+
+/* Close buttons */
+.modal-close{
+  color:#52645a!important;
+  background:#f3f7f4!important;
+  border:1px solid #e1eae4!important;
+  box-shadow:none!important;
+  min-height:38px!important;
+  padding:7px!important;
+}
+.modal-close:hover{
+  color:#143d28!important;
+  background:#e7f3eb!important;
+  transform:rotate(5deg) scale(1.06)!important;
+}
+
+/* Disabled */
+button:disabled,.btn:disabled{
+  opacity:.55!important;
+  cursor:not-allowed!important;
+  transform:none!important;
+  box-shadow:none!important;
+}
+
+/* Keyboard focus */
+button:focus-visible,.btn:focus-visible{
+  outline:none!important;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,.95),
+    0 0 0 6px rgba(21,150,83,.38)!important;
+}
+
+/* Mobile */
+@media(max-width:600px){
+  button,.btn{
+    min-height:45px!important;
+  }
+  .app-actions .btn{
+    width:100%;
+  }
+  .premium-lock-panel .btn,
+  #generateWorkoutBtn,
+  #coachSendBtn{
+    width:100%;
+  }
+}
+
+
+/* Final button polish */
+button, .btn, a.btn, .nav-btn, input[type="button"], input[type="submit"] {
+  box-sizing: border-box;
+  min-height: 46px;
+  min-width: 0;
+  padding: 12px 18px;
+  border-radius: 14px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  text-align: center;
+  vertical-align: middle;
+  word-break: normal;
+  overflow-wrap: anywhere;
+  transition: transform .18s ease, box-shadow .18s ease, background .18s ease, border-color .18s ease;
+}
+button:hover, .btn:hover, a.btn:hover, .nav-btn:hover {
+  transform: translateY(-2px) scale(1.015);
+}
+button:active, .btn:active, a.btn:active, .nav-btn:active {
+  transform: translateY(0) scale(.985);
+}
+button:focus-visible, .btn:focus-visible, a.btn:focus-visible, .nav-btn:focus-visible,
+input[type="button"]:focus-visible, input[type="submit"]:focus-visible {
+  outline: 3px solid rgba(34,197,94,.28);
+  outline-offset: 3px;
+}
+.btn-row, .button-row, .actions, .hero-actions, .scanner-actions, .modal-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+.btn-row > *, .button-row > *, .actions > *, .hero-actions > *, .scanner-actions > *, .modal-actions > * {
+  flex: 0 1 auto;
+}
+.premium-badge {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+@media (max-width: 620px) {
+  button, .btn, a.btn, .nav-btn, input[type="button"], input[type="submit"] {
+    min-height: 48px;
+    padding: 12px 15px;
+    border-radius: 13px;
+  }
+  .btn-row > *, .button-row > *, .actions > *, .hero-actions > *, .scanner-actions > *, .modal-actions > * {
+    flex: 1 1 100%;
+    width: 100%;
+  }
+}
+
+
+/* PWA install polish */
+#downloadAppBtn:disabled{background:#e9f7ef!important;color:#17713f!important;border-color:#bfe3cc!important;box-shadow:none!important}
+#downloadAppBtn[hidden]{display:none!important}
+
+</style>
+
+<style id="simple-ui-polish">
+:root{
+  --fs-green:#2f8f62;
+  --fs-green-dark:#246f4d;
+  --fs-green-soft:#eef8f2;
+  --fs-ink:#19332a;
+  --fs-muted:#6b7c74;
+  --fs-line:#e5ece8;
+  --fs-card:#ffffff;
+  --fs-bg:#f7faf8;
+  --fs-radius:18px;
+  --fs-shadow:0 8px 28px rgba(24,55,43,.08);
+}
+html{scroll-behavior:smooth}
+body{
+  background:var(--fs-bg)!important;
+  color:var(--fs-ink)!important;
+}
+.container{max-width:1120px!important}
+nav{
+  background:rgba(255,255,255,.94)!important;
+  border-bottom:1px solid var(--fs-line)!important;
+  box-shadow:0 2px 16px rgba(20,50,38,.05)!important;
+  backdrop-filter:blur(12px);
+}
+.nav-inner{min-height:68px!important;gap:14px!important}
+.brand{font-weight:800!important;letter-spacing:-.02em}
+.nav-links{gap:6px!important;align-items:center}
+.nav-links a{
+  border-radius:10px!important;
+  padding:9px 11px!important;
+  color:#4f665d!important;
+  transition:.18s ease!important;
+}
+.nav-links a:hover{
+  background:var(--fs-green-soft)!important;
+  color:var(--fs-green-dark)!important;
+}
+.nav-cta,.btn,.button{
+  border-radius:12px!important;
+  min-height:42px;
+  transition:transform .16s ease, box-shadow .16s ease, background .16s ease!important;
+}
+.nav-cta:hover,.btn:hover,.button:hover{
+  transform:translateY(-1px);
+  box-shadow:0 7px 18px rgba(47,143,98,.16);
+}
+section{scroll-margin-top:86px}
+.card,.feature-card,.result-card,.history-card,.coach-card,.workout-card,.pricing-card{
+  border:1px solid var(--fs-line)!important;
+  border-radius:var(--fs-radius)!important;
+  box-shadow:var(--fs-shadow)!important;
+}
+input,select,textarea{
+  border:1px solid #dbe6e0!important;
+  border-radius:11px!important;
+  background:#fff!important;
+}
+input:focus,select:focus,textarea:focus{
+  outline:none!important;
+  border-color:#7abd9b!important;
+  box-shadow:0 0 0 3px rgba(47,143,98,.12)!important;
+}
+.hero{
+  background:linear-gradient(180deg,#f1faf5 0%,#f7faf8 100%)!important;
+}
+.hero h1{letter-spacing:-.035em!important}
+.badge,.pill,.tag{
+  border-radius:999px!important;
+}
+button:disabled{opacity:.55;cursor:not-allowed;transform:none!important}
+@media(max-width:850px){
+  .nav-inner{flex-wrap:wrap!important;padding-top:8px!important;padding-bottom:8px!important}
+  .nav-links{
+    width:100%;
+    overflow-x:auto;
+    flex-wrap:nowrap!important;
+    padding-bottom:3px;
+    scrollbar-width:none;
+  }
+  .nav-links::-webkit-scrollbar{display:none}
+  .nav-links a,.nav-cta{white-space:nowrap!important;flex:0 0 auto}
+}
+@media(max-width:560px){
+  .container{padding-left:16px!important;padding-right:16px!important}
+  .hero{padding-top:34px!important;padding-bottom:34px!important}
+  .card,.feature-card,.result-card,.history-card,.coach-card,.workout-card,.pricing-card{
+    border-radius:15px!important;
+  }
+}
+
+.two-factor-manager{margin-top:14px;padding:16px;border:1px solid var(--line);border-radius:16px;background:#f8fcf9}
+.two-factor-header{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:12px}
+.two-factor-header strong{display:block;font-size:13px;margin-bottom:3px}
+.two-factor-header p{font-size:11px;color:var(--muted);line-height:1.5}
+.two-factor-qr{width:190px;height:190px;display:block;margin:14px auto;border-radius:12px;border:1px solid var(--line);background:#fff;padding:8px}
+.two-factor-secret{display:grid;gap:4px;margin-bottom:12px;padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:11px}
+.two-factor-secret span{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.two-factor-secret code{font-size:12px;word-break:break-all}
+
+</style>
+
+</head>
+<body>
+<nav>
+  <div class="container nav-inner">
+    <a class="brand" href="#"><span class="brand-icon">🥗</span>FoodSnap</a>
+    <div class="nav-links">
+      <a href="#scanner">📷 Scan Food</a><a href="#how">How It Works</a><a href="#reset">Healthy Reset</a><a href="#history">History</a>
+<a class="nav-link" href="#workout-routines">🏋️ Workout Routines</a>
+<a class="nav-link" href="#aiCoachSection">🤖 AI Coach</a>
+      <button type="button" class="nav-cta" id="accountNavBtn" onclick="openAuth()">Account</button>
+    </div>
+  </div>
+</nav>
+
+
+<div class="account-panel" id="accountPanel">
+  <div class="account-card">
+    <div class="account-top">
+      <div>
+        <div class="section-label">FoodSnap account</div>
+        <h2 id="accountTitle">Create your account</h2>
+      </div>
+      <button type="button" class="account-close" onclick="closeAuth()" aria-label="Close">×</button>
+    </div>
+
+    <div id="authForms">
+      <div class="auth-tabs">
+        <button type="button" class="auth-tab active" id="signupTab" onclick="showAuthMode('signup')">Create account</button>
+        <button type="button" class="auth-tab" id="loginTab" onclick="showAuthMode('login')">Log in</button>
+      </div>
+
+      <form id="signupForm" onsubmit="createAccount(event)">
+        <label>Email address</label>
+        <input id="signupEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+        <label>Password</label>
+        <input id="signupPassword" type="password" autocomplete="new-password" minlength="8" required placeholder="At least 8 characters">
+        <label>Confirm password</label>
+        <input id="signupConfirm" type="password" autocomplete="new-password" minlength="8" required placeholder="Enter it again">
+        <button class="primary account-submit" type="submit">Create account</button>
+        <p class="auth-note">Your password is sent only to the FoodSnap server, where it is securely hashed before storage.</p>
+      </form>
+
+      <form id="loginForm" style="display:none" onsubmit="loginAccount(event)">
+        <label>Email address</label>
+        <input id="loginEmail" type="email" autocomplete="email" required placeholder="you@example.com">
+        <label>Password</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" required placeholder="Your password">
+        <button class="primary account-submit" type="submit">Log in</button>
+        <p class="auth-note">If two-factor authentication is enabled, FoodSnap will ask for your authenticator code after your password is verified.</p>
+      </form>
+
+      <form id="twoFactorLoginForm" style="display:none" onsubmit="verifyLogin2FA(event)">
+        <label for="login2FACode">Authenticator code</label>
+        <input id="login2FACode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" required placeholder="6-digit code">
+        <button class="primary account-submit" type="submit">Verify and log in</button>
+        <button type="button" class="secondary account-submit" onclick="showAuthMode('login')">Back</button>
+        <p class="auth-note">Use the current 6-digit code from your authenticator app.</p>
+      </form>
+
+      <div class="auth-message" id="authMessage"></div>
+    </div>
+
+    <div id="accountDashboard" style="display:none">
+      <div class="account-user">
+        <div class="account-avatar">👤</div>
+        <div><strong id="accountEmail"></strong><span id="accountStatus">Account active</span></div>
+      </div>
+
+      <div class="security-box">
+        <div>
+          <strong>Two-factor authentication</strong>
+          <p id="twoFactorText">Add an extra verification step when signing in.</p>
+        </div>
+        <button type="button" class="secondary small-btn" id="twoFactorBtn" onclick="open2FAManager()">Enable 2FA</button>
+      </div>
+
+      <div class="security-box">
+        <div>
+          <strong>Saved history</strong>
+          <p id="historyCount">Your scans are associated with this account.</p>
+        </div>
+        <button type="button" class="secondary small-btn" onclick="closeAuth();document.getElementById('history').scrollIntoView({behavior:'smooth'})">View</button>
+      </div>
+
+      <div id="twoFactorManager" class="two-factor-manager" style="display:none">
+        <div class="two-factor-header">
+          <div>
+            <strong id="twoFactorManagerTitle">Set up two-factor authentication</strong>
+            <p id="twoFactorManagerText">Scan the QR code with an authenticator app, then enter the current code.</p>
+          </div>
+          <button type="button" class="account-close" onclick="close2FAManager()" aria-label="Close 2FA setup">×</button>
+        </div>
+        <img id="twoFactorQr" class="two-factor-qr" alt="Two-factor authentication QR code" style="display:none">
+        <div id="twoFactorSecretWrap" class="two-factor-secret" style="display:none">
+          <span>Manual setup key</span>
+          <code id="twoFactorSecret"></code>
+        </div>
+        <label for="twoFactorManagerCode">Verification code</label>
+        <input id="twoFactorManagerCode" inputmode="numeric" autocomplete="one-time-code" maxlength="6" pattern="\d{6}" placeholder="6-digit code">
+        <div class="modal-actions" style="margin-top:12px">
+          <button type="button" class="secondary" onclick="close2FAManager()">Cancel</button>
+          <button type="button" class="primary" id="twoFactorManagerAction" onclick="complete2FAManager()">Enable 2FA</button>
+        </div>
+      </div>
+
+      <button type="button" class="logout-btn" onclick="logout()">Log out</button>
+      <p class="auth-note">Account credentials, scan history, and 2FA settings are stored on the FoodSnap server. Passwords are hashed and 2FA is verified server-side.</p>
+    </div>
+  </div>
+</div>
+
+<main id="scanner">
+  <section class="hero container">
+    <div>
+      <div class="eyebrow">✨ Smart food scanner</div>
+      <h1>Understand your <span>plate.</span></h1>
+      <p class="hero-copy">Take a photo of a meal and get a clear, honest estimate of what may be on your plate. FoodSnap shows ranges and explains what can make an estimate uncertain.</p>
+      <div class="features">
+        <div class="feature"><span class="check">✓</span>Food recognition</div>
+        <div class="feature"><span class="check">✓</span>Transparent estimates</div>
+        <div class="feature"><span class="check">✓</span>Healthy habit guidance</div>
+      </div>
+    </div>
+
+    <div class="scanner">
+      <div class="scanner-inner">
+        <div id="uploadArea">
+          <div class="camera-icon">📷</div>
+          <h2>Scan your meal</h2>
+          <p>Take a picture or choose an existing food photo. FoodSnap sends the image to the configured nutrition AI on your server and returns a structured estimate.</p>
+          <div class="buttons">
+            <button type="button" class="primary" onclick="openCamera()">📸 Take Photo</button>
+            <button type="button" class="secondary" onclick="document.getElementById('fileInput').click()">Upload Photo</button>
+          </div>
+          <input id="fileInput" type="file" accept="image/*" capture="environment" />
+          <div class="notice">Estimates are not medical advice and can be wrong when portions or ingredients are unclear.</div>
+        </div>
+        <div id="previewArea">
+          <img id="foodImage" src="" alt="Selected food" />
+          <button type="button" class="analyze" onclick="analyzeFood()">✨ Analyze My Food</button>
+          <div class="notice">You can improve the estimate by adding portion information after scanning.</div>
+        </div>
+        <div class="loading" id="loading">
+          <div class="spinner"></div><strong>Analyzing your meal…</strong>
+          <p>Identifying foods and building an estimate</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="results container" id="results">
+    <div class="section-head">
+      <div><div class="section-label">Estimate</div><h2>Your food breakdown</h2></div>
+      <div class="estimate-badge">⚠ Estimate — not a measurement</div>
+    </div>
+    <div class="result-grid">
+      <div class="card">
+        <h2 class="food-name" id="foodName">Analyzing your meal…</h2>
+        <p class="food-description" id="foodDescription">FoodSnap will describe what is visible and give broad nutrition ranges. These are estimates, not measurements.</p>
+        <div class="nutrition">
+          <div class="nutrition-box"><span class="nutrition-value" id="calories">—</span><span class="nutrition-label">Calories</span></div>
+          <div class="nutrition-box"><span class="nutrition-value" id="protein">—</span><span class="nutrition-label">Protein</span></div>
+          <div class="nutrition-box"><span class="nutrition-value" id="carbs">—</span><span class="nutrition-label">Carbs</span></div>
+          <div class="nutrition-box"><span class="nutrition-value" id="fat">—</span><span class="nutrition-label">Fat</span></div>
+        </div>
+        <div class="range-note" id="rangeNote">Why a range? Portion size, cooking oil, sauces, recipe differences, and hidden ingredients can change nutrition substantially.</div>
+        <div class="ingredients">
+          <h3>Possible ingredients detected</h3>
+          <div class="ingredient-list" id="ingredientList"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="details">
+          <h3>What would improve accuracy?</h3>
+          <div class="info-line"><span>Portion</span><span>Tell us small / medium / large</span></div>
+          <div class="info-line"><span>Sauces</span><span>Identify creamy/oily sauces</span></div>
+          <div class="info-line"><span>Recipe</span><span>Homemade vs. packaged</span></div>
+          <div class="info-line"><span>Ingredients</span><span id="ingredientAdvice">Confirm uncertain items</span></div>
+          <div class="info-line"><span>AI confidence</span><span id="confidenceValue">—</span></div>
+        </div>
+        
+<div class="premium-estimate-gate" id="premiumEstimateGate">
+  <div class="gate-icon">✦</div>
+  <div>
+    <strong>Want a more accurate estimate?</strong>
+    <p>Premium lets you refine the portion size and sauce/dressing details so FoodSnap can update the estimate.</p>
+  </div>
+  <button type="button" class="btn btn-primary btn-small" id="openEstimatePremiumBtn">✦ Unlock Premium — $2</button>
+</div>
+
+<button type="button" id="improveEstimateBtn" class="primary" style="width:100%;margin-top:18px" onclick="openPortion()"><span class="lock-icon">✦</span> Improve estimate <span class="premium-mini-badge">PREMIUM</span></button>
+        <div class="accuracy-box"><strong>Accuracy note</strong>Food images alone cannot reliably measure exact calories or nutrients. Treat the result as a helpful estimate, not a laboratory value.</div>
+      </div>
+    </div>
+  </section>
+
+
+<section id="appSection" class="section app-download-section">
+  <div class="app-download-card">
+    <div class="app-copy">
+      <span class="eyebrow">FOODSNAP APP</span>
+      <h2>Get more specific answers on the app</h2>
+      <p>
+        The FoodSnap app can be designed for a deeper experience: save more scan history,
+        answer extra food-preference questions, track patterns over time, and get more
+        detailed explanations for each scan.
+      </p>
+
+      <div class="app-benefits">
+        <div><span>✓</span><strong>More detailed answers</strong><small>Extra context around meals, ingredients, and practical improvements.</small></div>
+        <div><span>✓</span><strong>Longer-term history</strong><small>See patterns across your saved scans instead of looking at one meal at a time.</small></div>
+        <div><span>✓</span><strong>Personal preferences</strong><small>Build recommendations around foods you like, dislike, or commonly eat.</small></div>
+        <div><span>✓</span><strong>Premium on mobile</strong><small>Use your Premium access and Improve Estimate feature from the app.</small></div>
+      </div>
+
+      <div class="app-actions">
+        <button type="button" class="btn btn-primary" id="downloadAppBtn">Download the FoodSnap App</button>
+        <button type="button" class="btn btn-outline" id="appLearnMoreBtn">How the app works</button>
+      </div>
+      <p class="tiny muted">Prototype: this button prepares an app-package download message. A production launch would connect it to the App Store and Google Play listings.</p>
+    </div>
+
+    <div class="phone-preview" aria-label="FoodSnap mobile app preview">
+      <div class="phone-frame">
+        <div class="phone-speaker"></div>
+        <div class="phone-screen">
+          <div class="mini-app-top">
+            <span>FoodSnap</span><span>✦</span>
+          </div>
+          <div class="mini-greeting">Your food snapshot</div>
+          <div class="mini-score">Detailed analysis</div>
+          <div class="mini-bar"><span></span></div>
+          <div class="mini-card">
+            <b>Grilled Chicken Bowl</b>
+            <small>Balanced meal estimate</small>
+            <div class="mini-pills"><i>Protein</i><i>Veggies</i><i>Carbs</i></div>
+          </div>
+          <div class="mini-card">
+            <b>Premium insight</b>
+            <small>Add variety and refine your portion estimate.</small>
+          </div>
+          <div class="mini-nav"><span>Scan</span><span>History</span><span>Premium</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<section id="workoutCoachSection" class="section workout-coach-section">
+  <div class="workout-shell">
+    <div class="workout-hero">
+      <div>
+        <span class="eyebrow">PREMIUM AI COACH</span>
+        <h2>Build a workout routine that fits your life</h2>
+        <p class="muted">Tell FoodSnap about your age range, experience, schedule, preferred activities, and equipment. Premium can turn those preferences into a simple activity plan.</p>
+      </div>
+      <div class="workout-badge">
+        <span>✦</span>
+        <strong>$2 Premium</strong>
+        <small>Personalized activity planning</small>
+      </div>
+    </div>
+
+    <div class="premium-lock-panel" id="workoutPremiumLock">
+      <div class="lock-circle">✦</div>
+      <div>
+        <h3>Premium feature</h3>
+        <p>Unlock Premium to use the AI Workout Coach and generate a personalized, age-appropriate activity routine.</p>
+      </div>
+      <button type="button" class="btn btn-primary" id="unlockWorkoutBtn">✦ Unlock Premium — $2</button>
+    </div>
+
+    <div class="workout-content" id="workoutContent" style="display:none;">
+      <div class="workout-form-card">
+        <div class="form-title">
+          <div>
+            <span class="eyebrow">STEP 1</span>
+            <h3>Your activity profile</h3>
+          </div>
+          <span class="step-pill">Premium</span>
+        </div>
+
+        <div class="form-grid">
+          <label>
+            <span>Age range</span>
+            <select id="workoutAge">
+              <option value="">Choose one</option>
+              <option value="13-14">13–14</option>
+              <option value="15-17">15–17</option>
+              <option value="18+">18+</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Experience</span>
+            <select id="workoutExperience">
+              <option value="">Choose one</option>
+              <option value="new">New to exercise</option>
+              <option value="some">Some experience</option>
+              <option value="regular">Already active</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Days available</span>
+            <select id="workoutDays">
+              <option value="">Choose one</option>
+              <option value="2">2 days</option>
+              <option value="3">3 days</option>
+              <option value="4">4 days</option>
+              <option value="5">5 days</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Time per session</span>
+            <select id="workoutTime">
+              <option value="">Choose one</option>
+              <option value="15">About 15 minutes</option>
+              <option value="25">About 25 minutes</option>
+              <option value="40">About 40 minutes</option>
+              <option value="60">About 60 minutes</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Main goal</span>
+            <select id="workoutGoal">
+              <option value="">Choose one</option>
+              <option value="fitness">General fitness</option>
+              <option value="strength">Build strength</option>
+              <option value="movement">Move more comfortably</option>
+              <option value="sport">Support a sport</option>
+              <option value="fun">Find activities I enjoy</option>
+            </select>
+          </label>
+
+          <label>
+            <span>Where will you exercise?</span>
+            <select id="workoutPlace">
+              <option value="">Choose one</option>
+              <option value="home">At home</option>
+              <option value="gym">At a gym</option>
+              <option value="outdoors">Outside</option>
+              <option value="mixed">A mix</option>
+            </select>
+          </label>
+        </div>
+
+        <label class="equipment-label">
+          <span>Equipment you have</span>
+          <input id="workoutEquipment" type="text" placeholder="Example: none, resistance bands, dumbbells, basketball">
+        </label>
+
+        <div class="workout-note">
+          <strong>Safety first:</strong> FoodSnap will not use body weight to set exercise targets or prescribe calorie-burning goals. The coach emphasizes enjoyable movement, gradual progress, rest, and choosing activities that are appropriate for your age and experience.
+        </div>
+
+        <button type="button" class="btn btn-primary generate-workout-btn" id="generateWorkoutBtn">Generate My Routine</button>
+      </div>
+
+      <div class="workout-result-card" id="workoutResult" style="display:none;">
+        <div class="result-top">
+          <div>
+            <span class="eyebrow">YOUR AI ROUTINE</span>
+            <h3 id="workoutResultTitle">Your activity plan</h3>
+          </div>
+          <span class="plan-ready">PLAN READY</span>
+        </div>
+        <p id="workoutResultIntro" class="muted"></p>
+        <div id="workoutDaysGrid" class="workout-days-grid"></div>
+        <div class="workout-footer-note">
+          <strong>Listen to your body.</strong> Stop if something hurts, take rest days, and consider checking with a parent/guardian or qualified health professional if you have an injury, medical condition, or concerns about starting exercise.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="aiCoachSection" class="section ai-coach-section">
+  <div class="ai-coach-card">
+    <div class="coach-header">
+      <div>
+        <span class="eyebrow">FOODSNAP AI COACH</span>
+        <h2>Talk with your AI food coach</h2>
+        <p class="muted">Tell the coach what you usually eat, what you want to improve, and what makes eating well difficult. It can turn that information into practical next steps.</p>
+      </div>
+      <div class="coach-orb">🤖</div>
+    </div>
+
+    <div class="coach-disclaimer">
+      <strong>Healthy guidance:</strong> The AI coach focuses on balanced habits, variety, regular meals, hydration, and realistic changes. It does not diagnose medical conditions or recommend extreme dieting, meal skipping, or unsafe weight-loss methods.
+    </div>
+
+    <div class="coach-chat" id="coachChat">
+      <div class="coach-message coach-ai">
+        <div class="message-avatar">🤖</div>
+        <div>
+          <strong>FoodSnap Coach</strong>
+          <p>Hi! Tell me what a normal day of eating looks like for you and one thing you'd like to improve. I'll help you find a few realistic next steps.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="coach-prompts">
+      <button type="button" class="coach-prompt" data-prompt="I want to eat more balanced meals. Where should I start?">🥗 Balance my meals</button>
+      <button type="button" class="coach-prompt" data-prompt="I don't eat many fruits or vegetables. Give me easy ideas.">🍎 More variety</button>
+      <button type="button" class="coach-prompt" data-prompt="I often have trouble eating regular meals. Help me make a simple routine.">⏰ Meal routine</button>
+      <button type="button" class="coach-prompt" data-prompt="Help me make healthier choices without giving up foods I enjoy.">❤️ Healthier habits</button>
+    </div>
+
+    <div class="coach-input-row">
+      <textarea id="coachInput" rows="3" placeholder="Example: I usually have cereal for breakfast, a sandwich for lunch, and whatever my family makes for dinner. I want to make my meals more balanced."></textarea>
+      <button type="button" class="btn btn-primary" id="coachSendBtn">Ask AI Coach</button>
+    </div>
+
+    <div class="coach-status tiny muted" id="coachStatus">AI Coach uses the FoodSnap server to securely call the configured AI model.</div>
+  </div>
+</section>
+
+<section id="premiumSection" class="section" style="padding-top:20px;">
+  <div class="section-head">
+    <div>
+      <span class="eyebrow">FOODSNAP PREMIUM</span>
+      <h2>Get a more specific plan for $2</h2>
+      <p class="muted">Premium turns your recent food scans into practical, non-extreme suggestions for building balanced eating habits.</p>
+    </div>
+    <span class="price-badge">$2 one-time purchase</span>
+  </div>
+
+  <div class="premium-grid">
+    <div class="card premium-card">
+      <h3>What Premium includes</h3>
+      <ul class="feature-list">
+        <li><strong>Meal balance review:</strong> see which food groups may be missing or overrepresented in a meal.</li>
+        <li><strong>Easy swaps:</strong> get realistic ideas such as adding vegetables, fruit, whole grains, protein, or a source of healthy fat.</li>
+        <li><strong>Meal-building guide:</strong> learn how to put together satisfying meals without skipping meals or following crash diets.</li>
+        <li><strong>Weekly habit checklist:</strong> hydration, regular meals, variety, sleep, and enjoyable movement.</li>
+        <li><strong>Scan-based suggestions:</strong> recommendations are based on the foods you scan, while clearly explaining that image estimates can be imperfect.</li>
+      </ul>
+      <button type="button" class="btn btn-primary" id="buyPremiumBtn">✦ Unlock Premium — $2</button>
+      <p class="tiny muted">Secure checkout is handled by Stripe. FoodSnap never receives or stores your card number.</p>
+    </div>
+
+    <div class="card" id="premiumPreviewCard">
+      <h3>Example of a Premium plan</h3>
+      <div class="plan-row"><span>🥗 Add variety</span><span>Include a fruit or vegetable with more meals.</span></div>
+      <div class="plan-row"><span>🍗 Include protein</span><span>Add a protein source when a meal is mostly starch or vegetables.</span></div>
+      <div class="plan-row"><span>🌾 Choose filling carbs</span><span>Try whole grains, potatoes, beans, or other carbohydrate foods you enjoy.</span></div>
+      <div class="plan-row"><span>💧 Hydration</span><span>Keep water available and drink regularly according to thirst.</span></div>
+      <div class="plan-row"><span>⏰ Regular meals</span><span>Avoid routinely skipping meals to compensate for what you ate earlier.</span></div>
+      <div class="plan-row"><span>😴 Recovery</span><span>Keep sleep and rest part of your overall routine.</span></div>
+    </div>
+  </div>
+
+  <div class="card premium-results" id="premiumResults" style="display:none;">
+    <div class="premium-result-head">
+      <div>
+        <span class="eyebrow">YOUR PREMIUM GUIDE</span>
+        <h3 id="premiumPlanTitle">Your food-habit plan</h3>
+      </div>
+      <span class="premium-active">PREMIUM ACTIVE</span>
+    </div>
+    <p id="premiumPlanIntro" class="muted"></p>
+    <div id="premiumPlanCards" class="premium-plan-grid"></div>
+    <div class="note-box">
+      <strong>Important:</strong> FoodSnap's photo analysis is an estimate, not a medical measurement. This guide focuses on healthy habits and variety rather than weight loss, calorie restriction, or punishment for eating certain foods.
+    </div>
+  </div>
+</section>
+
+</main>
+
+<section class="how" id="how">
+  <div class="container center">
+    <div class="section-label">Simple by design</div>
+    <h2>Three steps. That's it.</h2>
+    <p class="subtitle">The goal is understanding your food without turning meals into a numbers game.</p>
+    <div class="steps">
+      <div class="step"><div class="step-number">1</div><h3>Take a photo</h3><p>Capture a clear image with as much of the meal visible as possible.</p></div>
+      <div class="step"><div class="step-number">2</div><h3>Review the estimate</h3><p>FoodSnap identifies likely foods and gives ranges instead of pretending the numbers are exact.</p></div>
+      <div class="step"><div class="step-number">3</div><h3>Use the guidance</h3><p>Look for balanced, sustainable habits rather than trying to “fix” a single meal.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="reset-section" id="reset">
+  <div class="container reset-wrap">
+    <div class="center">
+      <div class="section-label">Healthy reset</div>
+      <h2>If your eating routine feels off, reset gently.</h2>
+      <p class="subtitle">One meal or one day does not need to be “fixed.” Focus on regular meals, variety, hydration, sleep, and enjoyable movement.</p>
+    </div>
+    <div class="reset-grid">
+      <div class="plan-card">
+        <h3>🌱 A simple next-day reset</h3>
+        <p>Use this when your routine has been irregular or meals have felt unbalanced.</p>
+        <div class="habit"><div class="habit-icon">🍳</div><div><strong>Return to regular meals</strong><span>Have your usual meals and snacks rather than skipping meals to compensate.</span></div></div>
+        <div class="habit"><div class="habit-icon">🥕</div><div><strong>Add variety</strong><span>Include foods from different groups across the day: grains, fruits or vegetables, protein foods, and fats.</span></div></div>
+        <div class="habit"><div class="habit-icon">💧</div><div><strong>Drink regularly</strong><span>Water is a simple default; drink according to thirst and your activity.</span></div></div>
+        <div class="habit"><div class="habit-icon">😴</div><div><strong>Prioritize sleep</strong><span>A consistent sleep routine supports energy, concentration, and everyday wellbeing.</span></div></div>
+      </div>
+      <div class="plan-card">
+        <h3>🧭 If this keeps happening</h3>
+        <p>Look for patterns instead of judging yourself over individual meals.</p>
+        <div class="habit"><div class="habit-icon">📝</div><div><strong>Notice patterns</strong><span>Ask: Am I eating regularly? Am I getting enough variety? Do I feel energized?</span></div></div>
+        <div class="habit"><div class="habit-icon">🍽️</div><div><strong>Make one small change</strong><span>For example, add a food you enjoy, make breakfast easier, or plan a convenient snack.</span></div></div>
+        <div class="habit"><div class="habit-icon">🚶</div><div><strong>Choose enjoyable movement</strong><span>Walking, sports, dancing, or other activities can support wellbeing without being punishment for eating.</span></div></div>
+        <div class="habit"><div class="habit-icon">🤝</div><div><strong>Ask for support</strong><span>If food or eating is causing ongoing stress, talk with a trusted adult or a qualified health professional.</span></div></div>
+      </div>
+    </div>
+    <div class="warning"><strong>Important:</strong> FoodSnap should not be used to encourage fasting, crash diets, extreme exercise, or cutting out foods just because an app estimates a number. Nutrition needs vary by person, age, activity, and circumstances.</div>
+  </div>
+</section>
+
+<section class="history container" id="history">
+  <div class="history-head"><div><div class="section-label">Your food journal</div><h2>Recent scans</h2><p id="historyAccountHint" style="color:var(--muted);font-size:12px;margin-top:4px">Log in to associate your scans with your account.</p></div></div>
+  <div class="scans" id="scanHistoryGrid">
+    <div class="scan-card"><div class="scan-photo">🔐</div><div class="scan-content"><h3>Log in to see your scans</h3><p>Your saved scan history is linked to your account.</p></div></div>
+  </div>
+</section>
+
+
+<section id="health-schedule" class="section" aria-labelledby="schedule-title">
+  <div class="section-heading">
+    <span class="eyebrow">HEALTH COACH</span>
+    <h2 id="schedule-title">Build a healthy daily schedule</h2>
+    <p>Choose a wake-up time and the times you normally eat. FoodSnap can turn them into a simple routine you can adjust as your school, work, sleep, and family schedule changes.</p>
+  </div>
+
+  <div class="card schedule-card">
+    <div class="schedule-grid">
+      <div class="form-group">
+        <label for="wakeTime">Wake-up time</label>
+        <input id="wakeTime" type="time" value="07:00">
+        <small>Aim for a consistent wake time that leaves enough room for your normal sleep needs.</small>
+      </div>
+
+      <div class="form-group">
+        <label for="breakfastTime">Breakfast / first meal</label>
+        <input id="breakfastTime" type="time" value="08:00">
+      </div>
+
+      <div class="form-group">
+        <label for="lunchTime">Lunch / midday meal</label>
+        <input id="lunchTime" type="time" value="12:30">
+      </div>
+
+      <div class="form-group">
+        <label for="snackTime">Optional snack</label>
+        <input id="snackTime" type="time" value="15:30">
+      </div>
+
+      <div class="form-group">
+        <label for="dinnerTime">Dinner / evening meal</label>
+        <input id="dinnerTime" type="time" value="18:30">
+      </div>
+    </div>
+
+    <div class="schedule-actions btn-row">
+      <button type="button" class="btn btn-primary" id="saveScheduleBtn">✓ Save my schedule</button>
+      <button type="button" class="btn btn-secondary" id="suggestScheduleBtn">✨ Suggest a routine</button>
+    </div>
+
+    <div id="scheduleResult" class="schedule-result" aria-live="polite">
+      <h3>Your FoodSnap routine</h3>
+      <div id="scheduleList"></div>
+      <p class="schedule-note">Health Coach suggestions are general wellness guidance, not medical advice. They do not require skipping meals or following a restrictive eating schedule.</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .schedule-card {
+    padding: 24px;
+    margin-top: 18px;
+  }
+  .schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .schedule-grid .form-group {
+    min-width: 0;
+  }
+  .schedule-grid input[type="time"] {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    padding: 10px 13px;
+    border-radius: 12px;
+  }
+  .schedule-actions {
+    margin-top: 20px;
+  }
+  .schedule-result {
+    margin-top: 22px;
+    padding: 18px;
+    border-radius: 16px;
+    background: rgba(34,197,94,.07);
+    border: 1px solid rgba(34,197,94,.18);
+  }
+  .schedule-result h3 {
+    margin-top: 0;
+  }
+  .schedule-list {
+    display: grid;
+    gap: 10px;
+  }
+  .schedule-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(255,255,255,.7);
+  }
+  .schedule-item strong {
+    font-variant-numeric: tabular-nums;
+  }
+  .schedule-note {
+    margin-bottom: 0;
+    font-size: .9rem;
+    opacity: .78;
+  }
+  @media (max-width: 650px) {
+    .schedule-grid { grid-template-columns: 1fr; }
+    .schedule-card { padding: 18px; }
+  }
+</style>
+
+
+<section id="wake-up-challenge" class="section" aria-labelledby="wake-challenge-title">
+  <div class="section-heading">
+    <span class="eyebrow">WAKE-UP CHALLENGE</span>
+    <h2 id="wake-challenge-title">Wake up and get moving</h2>
+    <p>Set a morning alarm and choose a short, gentle movement challenge to help you start your day. You can always use Snooze instead.</p>
+  </div>
+
+  <div class="card wake-card">
+    <div class="wake-settings-grid">
+      <div class="form-group">
+        <label for="alarmTime">Morning alarm</label>
+        <input id="alarmTime" type="time" value="07:00">
+      </div>
+
+      <div class="form-group">
+        <label for="wakeChallengeType">Challenge to dismiss</label>
+        <select id="wakeChallengeType">
+          <option value="stretch">30-second gentle stretch</option>
+          <option value="march">30-second easy marching in place</option>
+          <option value="mobility">5 easy mobility movements</option>
+          <option value="breaths">5 slow breaths + a gentle stretch</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="wake-actions btn-row">
+      <button type="button" class="btn btn-primary" id="setAlarmBtn">⏰ Set morning alarm</button>
+      <button type="button" class="btn btn-secondary" id="testAlarmBtn">▶ Test alarm</button>
+    </div>
+
+    <div class="wake-status" id="wakeStatus" aria-live="polite">
+      No alarm is currently running.
+    </div>
+
+    <div class="wake-alarm-panel" id="wakeAlarmPanel" hidden>
+      <div class="alarm-icon" aria-hidden="true">⏰</div>
+      <h3>Good morning!</h3>
+      <p id="wakeChallengeText">Complete your short movement challenge to dismiss the alarm.</p>
+
+      <div class="challenge-progress" aria-label="Challenge progress">
+        <div class="challenge-progress-bar" id="challengeProgressBar"></div>
+      </div>
+
+      <div class="challenge-count" id="challengeCount">0 / 5</div>
+
+      <div class="wake-challenge-actions btn-row">
+        <button type="button" class="btn btn-primary" id="challengeBtn">Start challenge</button>
+        <button type="button" class="btn btn-secondary" id="snoozeBtn">Snooze 5 minutes</button>
+        <button type="button" class="btn btn-ghost" id="stopAlarmBtn">Stop alarm</button>
+      </div>
+
+      <p class="wake-safety-note">
+        Keep movements comfortable and easy. Stop if anything hurts, you feel dizzy, or you feel unwell.
+        This feature is a reminder, not a fitness test.
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .wake-card {
+    padding: 24px;
+    margin-top: 18px;
+  }
+  .wake-settings-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+  }
+  .wake-settings-grid input,
+  .wake-settings-grid select {
+    width: 100%;
+    min-height: 48px;
+    box-sizing: border-box;
+    padding: 10px 13px;
+    border-radius: 12px;
+  }
+  .wake-actions {
+    margin-top: 20px;
+  }
+  .wake-status {
+    margin-top: 16px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    background: rgba(34,197,94,.07);
+  }
+  .wake-alarm-panel {
+    margin-top: 20px;
+    padding: 24px;
+    text-align: center;
+    border-radius: 18px;
+    border: 1px solid rgba(34,197,94,.25);
+    background: rgba(34,197,94,.08);
+  }
+  .wake-alarm-panel[hidden] {
+    display: none;
+  }
+  .alarm-icon {
+    font-size: 42px;
+    margin-bottom: 4px;
+  }
+  .wake-alarm-panel h3 {
+    margin: 4px 0 8px;
+  }
+  .challenge-progress {
+    height: 12px;
+    margin: 18px auto 8px;
+    max-width: 460px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(0,0,0,.09);
+  }
+  .challenge-progress-bar {
+    width: 0%;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #22c55e, #16a34a);
+    transition: width .25s ease;
+  }
+  .challenge-count {
+    font-weight: 700;
+    margin-bottom: 16px;
+  }
+  .wake-challenge-actions {
+    justify-content: center;
+  }
+  .wake-safety-note {
+    margin: 16px 0 0;
+    font-size: .88rem;
+    opacity: .78;
+  }
+  @media (max-width: 650px) {
+    .wake-settings-grid {
+      grid-template-columns: 1fr;
+    }
+    .wake-card {
+      padding: 18px;
+    }
+  }
+</style>
+
+
+
+<section class="section ai-coach-home-card" aria-labelledby="ai-coach-home-title">
+  <div class="card ai-home-inner">
+    <div>
+      <span class="eyebrow">AI COACH</span>
+      <h2 id="ai-coach-home-title">Your personal FoodSnap Coach</h2>
+      <p>Talk through your food habits, routines, workouts, or goals and get practical guidance.</p>
+    </div>
+    <a href="#ai-coach" class="btn btn-primary ai-home-button">🤖 Open AI Coach</a>
+  </div>
+</section>
+
+<style>
+  .ai-coach-home-card {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+  .ai-home-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    padding: 24px;
+    background: linear-gradient(135deg, rgba(34,197,94,.10), rgba(134,239,172,.16));
+    border: 1px solid rgba(34,197,94,.18);
+  }
+  .ai-home-inner h2 {
+    margin: 5px 0 7px;
+  }
+  .ai-home-inner p {
+    margin: 0;
+    opacity: .72;
+  }
+  .ai-home-button {
+    flex: 0 0 auto;
+    text-decoration: none;
+  }
+  @media (max-width: 650px) {
+    .ai-home-inner {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .ai-home-button {
+      width: 100%;
+    }
+  }
+</style>
+
+<section id="workout-routines" class="section" aria-labelledby="workout-routines-title">
+  <div class="section-heading">
+    <span class="eyebrow">WORKOUT ROUTINES</span>
+    <h2 id="workout-routines-title">Choose what you want to strengthen</h2>
+    <p>Select a muscle group and FoodSnap will show a simple routine you can adjust to your experience and available equipment.</p>
+  </div>
+
+  <div class="workout-routine-picker card">
+    <div class="muscle-buttons" role="group" aria-label="Choose a muscle group">
+      <button type="button" class="muscle-choice active" data-muscle="full">🌟 Full Body</button>
+      <button type="button" class="muscle-choice" data-muscle="legs">🦵 Legs</button>
+      <button type="button" class="muscle-choice" data-muscle="chest">💪 Chest</button>
+      <button type="button" class="muscle-choice" data-muscle="back">🔙 Back</button>
+      <button type="button" class="muscle-choice" data-muscle="shoulders">🏹 Shoulders</button>
+      <button type="button" class="muscle-choice" data-muscle="core">🧘 Core</button>
+      <button type="button" class="muscle-choice" data-muscle="arms">💪 Arms</button>
+    </div>
+
+    <div id="routineResult" class="routine-result" aria-live="polite"></div>
+  </div>
+</section>
+
+<style>
+  .workout-routine-picker {
+    padding: 24px;
+    margin-top: 18px;
+  }
+  .muscle-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .muscle-choice {
+    border: 1px solid rgba(34,197,94,.18);
+    background: rgba(34,197,94,.07);
+    color: inherit;
+    min-height: 46px;
+    padding: 11px 16px;
+    border-radius: 14px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .muscle-choice.active {
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 8px 18px rgba(22,163,74,.2);
+  }
+  .routine-result {
+    margin-top: 22px;
+    padding: 22px;
+    border-radius: 18px;
+    background: rgba(15,23,42,.025);
+    border: 1px solid rgba(15,23,42,.07);
+  }
+  .routine-result h3 {
+    margin: 0 0 7px;
+  }
+  .routine-result > p {
+    margin-top: 0;
+    opacity: .72;
+  }
+  .routine-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+  }
+  .routine-exercise {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 13px 15px;
+    border-radius: 13px;
+    background: #fff;
+    border: 1px solid rgba(15,23,42,.06);
+  }
+  .routine-exercise strong {
+    font-size: .95rem;
+  }
+  .routine-meta {
+    font-size: .85rem;
+    opacity: .62;
+    text-align: right;
+    white-space: nowrap;
+  }
+  .routine-note {
+    margin: 16px 0 0;
+    font-size: .86rem;
+    opacity: .68;
+  }
+  .routine-coach-link {
+    margin-top: 16px;
+  }
+  @media (max-width: 620px) {
+    .workout-routine-picker {
+      padding: 18px;
+    }
+    .muscle-choice {
+      flex: 1 1 calc(50% - 10px);
+    }
+    .routine-exercise {
+      align-items: flex-start;
+      flex-direction: column;
+    }
+    .routine-meta {
+      text-align: left;
+    }
+  }
+</style>
+
+<footer>© 2026 FoodSnap · Nutrition estimates are informational. Premium is a $2 production-ready PWA and does not process real payments. and may be inaccurate. FoodSnap is not a medical service.</footer>
+
+<div class="modal-backdrop" id="modal">
+  <div class="modal">
+    <h2>Improve the estimate</h2>
+    <p>These details can narrow an estimate, but they still cannot make image-based nutrition perfectly accurate.</p>
+    <label for="portion">Approximate portion</label>
+    <select id="portion"><option>Small</option><option selected>Medium</option><option>Large</option></select>
+    <label for="sauce">Sauce / dressing</label>
+    <select id="sauce"><option>None or very little</option><option selected>Some</option><option>A generous amount</option><option>Not sure</option></select>
+    <div class="modal-actions"><button type="button" class="close" onclick="if(window.closeModal) closeModal();">Cancel</button><button type="button" class="primary" onclick="applyEstimate()">Update estimate</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  const API_BASE = window.FOODSNAP_API_BASE || '';
+  const fileInput = document.getElementById('fileInput');
+  const uploadArea = document.getElementById('uploadArea');
+  const previewArea = document.getElementById('previewArea');
+  const foodImage = document.getElementById('foodImage');
+  const loading = document.getElementById('loading');
+  const results = document.getElementById('results');
+  const modal = document.getElementById('modal');
+  let currentImageDataUrl = '';
+  let currentAnalysis = null;
+  let login2FAInProgress = false;
+
+  window.foodsnapUser = null;
+
+  async function api(path, options={}){
+    const response = await fetch(API_BASE + path, {
+      credentials:'include',
+      headers:{'Content-Type':'application/json', ...(options.headers||{})},
+      ...options
+    });
+    const type = response.headers.get('content-type') || '';
+    const body = type.includes('application/json') ? await response.json() : await response.text();
+    if(!response.ok){
+      const message = body && body.error ? body.error : (typeof body === 'string' ? body : 'Request failed.');
+      throw new Error(message);
+    }
+    return body;
+  }
+
+  function setAccountMessage(message){
+    const box = document.getElementById('authMessage');
+    if(!box)return;
+    box.textContent = message || '';
+    box.style.display = message ? 'block' : 'none';
+  }
+
+  function openCamera(){ fileInput && fileInput.click(); }
+  window.openCamera = openCamera;
+
+  async function fileToDataUrl(file){
+    // Resize client-side before upload so mobile photos do not create giant API requests.
+    const bitmap = await createImageBitmap(file);
+    const maxSide = 1600;
+    const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(bitmap.width * scale));
+    canvas.height = Math.max(1, Math.round(bitmap.height * scale));
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
+    bitmap.close?.();
+    return canvas.toDataURL('image/jpeg', 0.82);
+  }
+
+  fileInput && fileInput.addEventListener('change', async function(){
+    const file = this.files && this.files[0];
+    if(!file)return;
+    if(!file.type.startsWith('image/')){ alert('Please choose an image file.'); return; }
+    if(file.size > 12*1024*1024){ alert('Please choose an image smaller than 12 MB.'); return; }
+    try{
+      currentImageDataUrl = await fileToDataUrl(file);
+      foodImage.src = currentImageDataUrl;
+      foodImage.alt = 'Selected food photo';
+      uploadArea.style.display='none';
+      previewArea.style.display='block';
+    }catch(error){
+      console.error(error);
+      alert('FoodSnap could not prepare that image. Please try another photo.');
+    }
+  });
+
+  function resetScanner(){
+    currentImageDataUrl='';
+    currentAnalysis=null;
+    fileInput.value='';
+    results.style.display='none';
+    loading.style.display='none';
+    previewArea.style.display='none';
+    uploadArea.style.display='block';
+  }
+  window.resetScanner = resetScanner;
+
+  function formatRange(min,max,suffix=''){ return `${min}–${max}${suffix}`; }
+
+  function renderAnalysis(data){
+    currentAnalysis = data;
+    document.getElementById('foodName').textContent = data.food_name || 'Unclear meal';
+    document.getElementById('foodDescription').textContent = data.description || 'The image does not provide enough detail for a precise description.';
+    document.getElementById('calories').textContent = formatRange(data.calorie_min,data.calorie_max);
+    document.getElementById('protein').textContent = formatRange(data.protein_min_g,data.protein_max_g,'g');
+    document.getElementById('carbs').textContent = formatRange(data.carb_min_g,data.carb_max_g,'g');
+    document.getElementById('fat').textContent = formatRange(data.fat_min_g,data.fat_max_g,'g');
+    document.getElementById('confidenceValue').textContent = data.confidence ? data.confidence[0].toUpperCase()+data.confidence.slice(1) : '—';
+    const uncertainty = Array.isArray(data.uncertainty_notes) ? data.uncertainty_notes.join(' ') : '';
+    document.getElementById('rangeNote').textContent = uncertainty ? `Estimate limits: ${uncertainty}` : 'Why a range? Portion size, cooking oil, sauces, recipe differences, and hidden ingredients can change nutrition substantially.';
+    document.getElementById('ingredientAdvice').textContent = data.ingredient_advice || 'Confirm uncertain items';
+    const list = document.getElementById('ingredientList');
+    list.innerHTML='';
+    (Array.isArray(data.ingredients) ? data.ingredients : []).slice(0,12).forEach(item=>{
+      const tag=document.createElement('span'); tag.className='ingredient'; tag.textContent=item; list.appendChild(tag);
+    });
+  }
+
+  async function analyzeFood(refinement=null){
+    if(!currentImageDataUrl){ alert('Choose a food photo first.'); return; }
+    previewArea.style.display='none';
+    loading.style.display='block';
+    loading.querySelector('strong').textContent = refinement ? 'Updating your estimate…' : 'Analyzing your meal…';
+    loading.querySelector('p').textContent = refinement ? 'Applying your portion and sauce details' : 'Identifying foods and building an estimate';
+    try{
+      const data = await api('/api/scan', {method:'POST', body:JSON.stringify({
+        image:currentImageDataUrl,
+        refinement: refinement || null
+      })});
+      renderAnalysis(data.analysis);
+      results.style.display='block';
+      if(data.saved){
+        await loadHistory();
+        refreshAccountUI();
+      }
+      results.scrollIntoView({behavior:'smooth',block:'start'});
+    }catch(error){
+      console.error(error);
+      alert(error.message || 'FoodSnap could not analyze this image.');
+      previewArea.style.display='block';
+    }finally{
+      loading.style.display='none';
+    }
+  }
+  window.analyzeFood = analyzeFood;
+
+  function openPortion(){
+    if(!modal)return;
+    modal.style.display='flex';
+    modal.setAttribute('aria-hidden','false');
+  }
+  function closeModal(){
+    if(!modal)return;
+    modal.style.display='none';
+    modal.setAttribute('aria-hidden','true');
+  }
+  window.openPortion=openPortion;
+  window.closeModal=closeModal;
+
+  async function applyEstimate(){
+    const p=document.getElementById('portion').value;
+    const s=document.getElementById('sauce').value;
+    closeModal();
+    await analyzeFood({portion:p,sauce:s});
+  }
+  window.applyEstimate=applyEstimate;
+  window.scrollToScanner=function(){document.getElementById('scanner')?.scrollIntoView({behavior:'smooth'});};
+
+  function showAuthMode(mode){
+    const signup=mode==='signup';
+    document.getElementById('signupForm').style.display=signup?'block':'none';
+    document.getElementById('loginForm').style.display=signup?'none':'block';
+    document.getElementById('twoFactorLoginForm').style.display='none';
+    document.getElementById('signupTab').classList.toggle('active',signup);
+    document.getElementById('loginTab').classList.toggle('active',!signup);
+    document.getElementById('accountTitle').textContent=signup?'Create your account':'Welcome back';
+    setAccountMessage('');
+    login2FAInProgress=false;
+  }
+  window.showAuthMode=showAuthMode;
+
+  function openAuth(){
+    document.getElementById('accountPanel').style.display='flex';
+    refreshAccountUI();
+  }
+  function closeAuth(){document.getElementById('accountPanel').style.display='none';}
+  window.openAuth=openAuth; window.closeAuth=closeAuth;
+
+  async function createAccount(e){
+    e.preventDefault();
+    setAccountMessage('');
+    const email=document.getElementById('signupEmail').value.trim().toLowerCase();
+    const password=document.getElementById('signupPassword').value;
+    const confirmPassword=document.getElementById('signupConfirm').value;
+    if(password!==confirmPassword){setAccountMessage('The passwords do not match.');return;}
+    try{
+      await api('/api/auth/signup',{method:'POST',body:JSON.stringify({email,password})});
+      await refreshAccountUI();
+      closeAuth();
+    }catch(error){setAccountMessage(error.message);}
+  }
+  window.createAccount=createAccount;
+
+  async function loginAccount(e){
+    e.preventDefault();
+    setAccountMessage('');
+    const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+    const password=document.getElementById('loginPassword').value;
+    try{
+      const result=await api('/api/auth/login',{method:'POST',body:JSON.stringify({email,password})});
+      if(result.requires2FA){
+        login2FAInProgress=true;
+        document.getElementById('loginForm').style.display='none';
+        document.getElementById('twoFactorLoginForm').style.display='block';
+        document.getElementById('accountTitle').textContent='Verify your sign-in';
+        document.getElementById('login2FACode').focus();
+        return;
+      }
+      await refreshAccountUI();
+      closeAuth();
+    }catch(error){setAccountMessage(error.message);}
+  }
+  window.loginAccount=loginAccount;
+
+  async function verifyLogin2FA(e){
+    e.preventDefault();
+    setAccountMessage('');
+    const code=document.getElementById('login2FACode').value.trim();
+    try{
+      await api('/api/auth/2fa/verify-login',{method:'POST',body:JSON.stringify({code})});
+      login2FAInProgress=false;
+      document.getElementById('login2FACode').value='';
+      await refreshAccountUI();
+      closeAuth();
+    }catch(error){setAccountMessage(error.message);}
+  }
+  window.verifyLogin2FA=verifyLogin2FA;
+
+  async function refreshAccountUI(){
+    let me=null;
+    try{ me=await api('/api/auth/me'); }catch(_){ me=null; }
+    window.foodsnapUser=me?.user || null;
+    const loggedIn=!!window.foodsnapUser;
+    document.getElementById('authForms').style.display=loggedIn?'none':'block';
+    document.getElementById('accountDashboard').style.display=loggedIn?'block':'none';
+    document.getElementById('accountNavBtn').textContent=loggedIn?'My Account':'Account';
+    document.getElementById('historyAccountHint').textContent=loggedIn
+      ? `Your saved scans are associated with ${window.foodsnapUser.email}.`
+      : 'Log in to associate your scans with your account.';
+    document.getElementById('twoFactorManager').style.display='none';
+    if(!loggedIn){showAuthMode('signup');await loadHistory();return;}
+    document.getElementById('accountTitle').textContent='Your account';
+    document.getElementById('accountEmail').textContent=window.foodsnapUser.email;
+    document.getElementById('accountStatus').textContent=window.foodsnapUser.twoFactor?'2FA enabled':'Account active';
+    document.getElementById('twoFactorBtn').textContent=window.foodsnapUser.twoFactor?'Manage 2FA':'Enable 2FA';
+    document.getElementById('twoFactorText').textContent=window.foodsnapUser.twoFactor
+      ? 'Two-factor authentication is enabled for this account.'
+      : 'Add an authenticator-app verification step when signing in.';
+    await loadHistory();
+    document.getElementById('historyCount').textContent = `${(window.foodsnapUser.scanCount||0)} saved scan${window.foodsnapUser.scanCount===1?'':'s'} associated with this account.`;
+  }
+  window.refreshAccountUI=refreshAccountUI;
+
+  async function loadHistory(){
+    const grid=document.getElementById('scanHistoryGrid');
+    if(!grid)return;
+    try{
+      const result=await api('/api/scans');
+      grid.innerHTML='';
+      if(!result.scans?.length){
+        const card=document.createElement('div');card.className='scan-card';
+        card.innerHTML='<div class="scan-photo">📷</div><div class="scan-content"><h3>No saved scans yet</h3><p>Your analyzed meals will appear here when you are signed in.</p></div>';
+        grid.appendChild(card); return;
+      }
+      result.scans.forEach(scan=>{
+        const card=document.createElement('div');card.className='scan-card';
+        const emoji = (scan.name||'').toLowerCase().includes('salad')?'🥗' : (scan.name||'').toLowerCase().includes('rice')?'🍚' : (scan.name||'').toLowerCase().includes('pasta')?'🍝' : '🍽️';
+        const when = new Date(scan.created_at).toLocaleString([], {dateStyle:'medium',timeStyle:'short'});
+        card.innerHTML='<div class="scan-photo">'+emoji+'</div><div class="scan-content"><h3></h3><p></p></div>';
+        card.querySelector('h3').textContent=scan.name || 'Food scan';
+        card.querySelector('p').textContent='Estimate saved · '+when;
+        grid.appendChild(card);
+      });
+    }catch(_){
+      grid.innerHTML='<div class="scan-card"><div class="scan-photo">🔐</div><div class="scan-content"><h3>Sign in to view history</h3><p>Saved scans are only available to the signed-in account.</p></div></div>';
+    }
+  }
+  window.loadHistory=loadHistory;
+
+  async function logout(){
+    try{await api('/api/auth/logout',{method:'POST',body:'{}'});}catch(_){ }
+    window.foodsnapUser=null;
+    closeAuth();
+    await refreshAccountUI();
+  }
+  window.logout=logout;
+
+  async function open2FAManager(){
+    const enabled=!!window.foodsnapUser?.twoFactor;
+    const box=document.getElementById('twoFactorManager');
+    const qr=document.getElementById('twoFactorQr');
+    const secretWrap=document.getElementById('twoFactorSecretWrap');
+    const title=document.getElementById('twoFactorManagerTitle');
+    const textEl=document.getElementById('twoFactorManagerText');
+    const action=document.getElementById('twoFactorManagerAction');
+    document.getElementById('twoFactorManagerCode').value='';
+    try{
+      if(enabled){
+        title.textContent='Disable two-factor authentication';
+        textEl.textContent='Enter a current authenticator code to disable 2FA.';
+        qr.style.display='none'; secretWrap.style.display='none';
+        action.textContent='Disable 2FA';
+      }else{
+        const setup=await api('/api/auth/2fa/setup',{method:'POST',body:'{}'});
+        title.textContent='Set up two-factor authentication';
+        textEl.textContent='Scan the QR code with Google Authenticator, Microsoft Authenticator, 1Password, or another TOTP app, then enter the current code.';
+        qr.src=setup.qrDataUrl; qr.style.display='block';
+        document.getElementById('twoFactorSecret').textContent=setup.secret;
+        secretWrap.style.display='grid';
+        action.textContent='Enable 2FA';
+      }
+      box.dataset.mode=enabled?'disable':'enable';
+      box.style.display='block';
+      document.getElementById('twoFactorManagerCode').focus();
+    }catch(error){setAccountMessage(error.message);}
+  }
+  window.open2FAManager=open2FAManager;
+  function close2FAManager(){document.getElementById('twoFactorManager').style.display='none';}
+  window.close2FAManager=close2FAManager;
+
+  async function complete2FAManager(){
+    const mode=document.getElementById('twoFactorManager').dataset.mode;
+    const code=document.getElementById('twoFactorManagerCode').value.trim();
+    if(!/^\d{6}$/.test(code)){alert('Enter the current 6-digit authenticator code.');return;}
+    try{
+      const endpoint=mode==='disable'?'/api/auth/2fa/disable':'/api/auth/2fa/enable';
+      await api(endpoint,{method:'POST',body:JSON.stringify({code})});
+      close2FAManager();
+      await refreshAccountUI();
+      alert(mode==='disable'?'Two-factor authentication is now disabled.':'Two-factor authentication is now enabled.');
+    }catch(error){alert(error.message);}
+  }
+  window.complete2FAManager=complete2FAManager;
+
+  document.getElementById('accountPanel')?.addEventListener('click',function(e){if(e.target===this)closeAuth();});
+  window.addEventListener('click',e=>{if(e.target===modal)closeModal();});
+  fileInput && fileInput.addEventListener('click',()=>{ /* allow re-selecting the same file */ });
+
+  refreshAccountUI();
+})();
+
+/* FoodSnap Premium — Stripe checkout and account-backed access */
+document.addEventListener('DOMContentLoaded',function(){
+  const premiumNavBtn = document.getElementById('premiumNavBtn');
+  const buyBtn = document.getElementById('buyPremiumBtn');
+  const checkoutModal = document.getElementById('premiumCheckoutModal');
+  const closeBtn = document.getElementById('closePremiumCheckout');
+  const confirmBtn = document.getElementById('confirmCheckoutBtn');
+  const premiumResults = document.getElementById('premiumResults');
+  const planTitle = document.getElementById('premiumPlanTitle');
+  const planIntro = document.getElementById('premiumPlanIntro');
+  const planCards = document.getElementById('premiumPlanCards');
+  const API_BASE = window.FOODSNAP_API_BASE || '';
+  let premiumActive = false;
+
+  function showModal(){
+    if(!checkoutModal) return;
+    checkoutModal.classList.add('show');
+    checkoutModal.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  function closeModal(){
+    if(!checkoutModal) return;
+    checkoutModal.classList.remove('show');
+    checkoutModal.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  }
+  function userSignedIn(){ return Boolean(window.foodsnapUser?.email); }
+  function goAccount(){ if(typeof window.openAuth==='function') window.openAuth(); }
+
+  async function getPremiumStatus(){
+    try{
+      const res=await fetch(API_BASE+'/api/premium/status',{credentials:'include',cache:'no-store'});
+      const data=await res.json();
+      premiumActive=Boolean(data?.premium?.active);
+      window.foodsnapPremiumActive=premiumActive;
+      return data;
+    }catch(e){
+      premiumActive=Boolean(window.foodsnapUser?.premium?.active);
+      window.foodsnapPremiumActive=premiumActive;
+      return {authenticated:userSignedIn(),premium:{active:premiumActive}};
+    }
+  }
+
+  function syncPremiumUI(){
+    if(buyBtn){
+      buyBtn.disabled=premiumActive;
+      buyBtn.textContent=premiumActive?'Premium active ✓':'✦ Unlock Premium — $2';
+    }
+    if(premiumNavBtn) premiumNavBtn.textContent=premiumActive?'⭐ Premium Active':'Premium';
+    buildPremiumPlanIfActive();
+    window.dispatchEvent(new Event('premium-state-changed'));
+  }
+
+  async function openCheckout(){
+    const status=await getPremiumStatus();
+    if(status?.premium?.active){
+      premiumActive=true; syncPremiumUI(); buildPremiumPlanIfActive();
+      document.getElementById('premiumSection')?.scrollIntoView({behavior:'smooth',block:'start'});
+      return;
+    }
+    if(!status?.authenticated || !userSignedIn()){
+      closeModal();
+      alert('Please sign in or create a FoodSnap account before purchasing Premium.');
+      goAccount();
+      return;
+    }
+    showModal();
+  }
+
+  async function startStripeCheckout(){
+    if(confirmBtn.disabled) return;
+    if(!userSignedIn()){
+      closeModal();
+      alert('Please sign in before starting checkout.');
+      goAccount();
+      return;
+    }
+    confirmBtn.disabled=true;
+    confirmBtn.textContent='Opening secure checkout…';
+    try{
+      const res=await fetch(API_BASE+'/api/checkout/create-session',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:'{}'});
+      const data=await res.json();
+      if(!res.ok) throw new Error(data.error||'Unable to start checkout.');
+      if(!data.url) throw new Error('Stripe did not return a checkout URL.');
+      window.location.assign(data.url);
+    }catch(error){
+      alert(error.message);
+      confirmBtn.disabled=false;
+      confirmBtn.textContent='Pay $2 securely';
+    }
+  }
+
+  window.openFoodSnapPremiumCheckout=openCheckout;
+  window.startFoodSnapPremiumCheckout=startStripeCheckout;
+
+  function escapeHtml(value){const div=document.createElement('div');div.textContent=String(value);return div.innerHTML;}
+  async function buildPremiumPlanIfActive(){
+    if(!premiumActive || !premiumResults || !planCards) return;
+    let scans=[];
+    try{
+      const res=await fetch(API_BASE+'/api/scans',{credentials:'include',cache:'no-store'});
+      if(res.ok){const data=await res.json();scans=Array.isArray(data.scans)?data.scans:[];}
+    }catch(e){}
+    const names=scans.slice(0,5).map(s=>s.name).filter(Boolean);
+    const plan=[
+      {icon:'🥗',title:'Build balanced meals',text:'Aim for a practical mix of foods across meals without needing every component to be perfect.'},
+      {icon:'🍎',title:'Increase variety',text:'Rotate fruits, vegetables, grains, beans, dairy or alternatives, nuts/seeds, and protein foods you enjoy.'},
+      {icon:'⏰',title:'Keep meals regular',text:'Use a meal rhythm that works for you rather than compensating by skipping meals.'},
+      {icon:'💧',title:'Make hydration easy',text:'Keep water nearby and drink regularly, paying attention to thirst and your routine.'},
+      {icon:'🍽️',title:'Use simple upgrades',text:'Add helpful foods such as produce, beans, whole grains, yogurt, protein foods, or nuts/seeds when they fit.'},
+      {icon:'😴',title:'Support the whole routine',text:'Sleep, rest, enjoyable movement, and supportive relationships are part of an overall healthy routine.'}
+    ];
+    planTitle.textContent=names.length?'Your personalized FoodSnap habit guide':'Your FoodSnap habit guide';
+    planIntro.textContent=names.length
+      ? 'Based on your recent scans ('+names.join(', ')+'), here are practical areas to consider. These are habit ideas—not medical treatment.'
+      : 'This starter guide focuses on broadly useful eating habits. As you scan more meals, FoodSnap can make the suggestions more specific.';
+    planCards.innerHTML=plan.map(p=>`<div class="premium-plan-item"><div style="font-size:1.5rem">${p.icon}</div><h4>${escapeHtml(p.title)}</h4><p class="muted" style="margin:0;line-height:1.55">${escapeHtml(p.text)}</p></div>`).join('');
+    premiumResults.style.display='block';
+  }
+
+  async function handleReturnFromStripe(){
+    const params=new URLSearchParams(location.search);
+    const result=params.get('premium');
+    const sessionId=params.get('session_id');
+    if(!result) return;
+    if(result==='cancelled'){
+      history.replaceState({},'',location.pathname+location.hash);
+      alert('Checkout was cancelled. No payment was made.');
+      return;
+    }
+    if(result==='success' && sessionId){
+      try{
+        const res=await fetch(API_BASE+'/api/checkout/status?session_id='+encodeURIComponent(sessionId),{credentials:'include',cache:'no-store'});
+        const data=await res.json();
+        if(res.ok && data.paid){
+          premiumActive=true; window.foodsnapPremiumActive=true; syncPremiumUI(); buildPremiumPlanIfActive();
+          alert('Premium is active on your FoodSnap account.');
+        }else{
+          alert('Payment was received or is still being confirmed. Refresh this page in a moment to see Premium activate.');
+          await getPremiumStatus(); syncPremiumUI();
+        }
+      }catch(e){
+        alert('Your payment is being verified. Refresh the page shortly to see Premium activate.');
+      }
+      history.replaceState({},'',location.pathname+location.hash);
+    }
+  }
+
+  if(premiumNavBtn) premiumNavBtn.addEventListener('click',()=>{
+    document.getElementById('premiumSection')?.scrollIntoView({behavior:'smooth',block:'start'});
+    if(!premiumActive) openCheckout(); else buildPremiumPlanIfActive();
+  });
+  if(buyBtn) buyBtn.addEventListener('click',()=>premiumActive?buildPremiumPlanIfActive():openCheckout());
+  if(closeBtn) closeBtn.addEventListener('click',closeModal);
+  if(confirmBtn) confirmBtn.addEventListener('click',startStripeCheckout);
+  if(checkoutModal) checkoutModal.addEventListener('click',e=>{if(e.target===checkoutModal)closeModal();});
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'&&checkoutModal?.classList.contains('show'))closeModal();});
+  window.refreshPremiumState=async()=>{await getPremiumStatus();syncPremiumUI();};
+  window.foodsnapIsPremium=()=>premiumActive;
+
+  getPremiumStatus().then(syncPremiumUI).catch(()=>{}).finally(handleReturnFromStripe);
+});;
+
+/* Premium paywall for Improve Estimate */
+(function(){
+  const btn = document.getElementById('improveEstimateBtn');
+  const gateBtn = document.getElementById('openEstimatePremiumBtn');
+  function isPremium(){ return Boolean(window.foodsnapIsPremium?.() || window.foodsnapPremiumActive); }
+  function openCheckout(){
+    if(typeof window.refreshPremiumState==='function') window.refreshPremiumState().then(()=>{
+      if(!isPremium()) document.getElementById('premiumCheckoutModal')?.classList.add('show');
+    });
+  }
+  function setGateState(){
+    if(!btn) return;
+    if(isPremium()){
+      btn.classList.remove('premium-locked');
+      btn.innerHTML='<span class="lock-icon">✓</span> Improve estimate';
+      btn.disabled=false;
+    }else{
+      btn.classList.add('premium-locked');
+      btn.innerHTML='<span class="lock-icon">✦</span> Improve estimate <span class="premium-mini-badge">PREMIUM</span>';
+    }
+  }
+  if(btn) btn.addEventListener('click',e=>{
+    if(!isPremium()){
+      e.preventDefault(); e.stopImmediatePropagation(); openCheckout(); return false;
+    }
+  },true);
+  if(gateBtn) gateBtn.addEventListener('click',openCheckout);
+  window.addEventListener('premium-state-changed',setGateState);
+  window.addEventListener('focus',()=>setTimeout(setGateState,100));
+  setTimeout(setGateState,100);
+})();
+
+
+/* FoodSnap PWA install */
+(function(){
+  const downloadBtn=document.getElementById('downloadAppBtn');
+  const learnBtn=document.getElementById('appLearnMoreBtn');
+  let deferredPrompt=null;
+
+  function isStandalone(){
+    return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+  }
+  function detectIOS(){
+    return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
+  }
+  function showInstallHelp(){
+    const text=detectIOS()
+      ? 'On iPhone or iPad: tap the Share button in Safari, then choose “Add to Home Screen.”'
+      : 'This browser cannot show the one-tap install prompt yet. Open your browser menu and choose “Install FoodSnap” or “Add to Home screen.”';
+    alert(text);
+  }
+  window.addEventListener('beforeinstallprompt',event=>{
+    event.preventDefault();
+    deferredPrompt=event;
+    if(downloadBtn){downloadBtn.hidden=false;downloadBtn.textContent='Install FoodSnap App';}
+  });
+  window.addEventListener('appinstalled',()=>{
+    deferredPrompt=null;
+    if(downloadBtn){downloadBtn.textContent='FoodSnap Installed ✓';downloadBtn.disabled=true;}
+  });
+
+  if(downloadBtn){
+    if(isStandalone()){
+      downloadBtn.textContent='FoodSnap Installed ✓';
+      downloadBtn.disabled=true;
+    }
+    downloadBtn.addEventListener('click',async()=>{
+      if(isStandalone()) return;
+      if(deferredPrompt){
+        deferredPrompt.prompt();
+        const choice=await deferredPrompt.userChoice;
+        deferredPrompt=null;
+        if(choice?.outcome==='accepted'){
+          downloadBtn.textContent='FoodSnap Installed ✓';
+          downloadBtn.disabled=true;
+        }
+        return;
+      }
+      showInstallHelp();
+    });
+  }
+  if(learnBtn){
+    learnBtn.addEventListener('click',()=>{
+      const appSection=document.getElementById('appSection');
+      appSection?.querySelector('.app-copy p')?.scrollIntoView({behavior:'smooth',block:'center'});
+      setTimeout(()=>alert('FoodSnap installs as a Progressive Web App. It gets its own app icon and standalone window, while keeping your account-backed AI and Premium features connected to the same site.'),250);
+    });
+  }
+
+  if('serviceWorker' in navigator){
+    window.addEventListener('load',()=>navigator.serviceWorker.register('/sw.js').catch(err=>console.warn('FoodSnap service worker registration failed',err)));
+  }
+})();
+
+
+(function(){
+  const b=document.getElementById('appNavBtn');
+  const s=document.getElementById('appSection');
+  if(b&&s)b.addEventListener('click',()=>s.scrollIntoView({behavior:'smooth',block:'start'}));
+})();
+
+
+/* AI Coach — server-backed model */
+(function(){
+  const section = document.getElementById('aiCoachSection');
+  const nav = document.getElementById('aiCoachNavBtn');
+  const input = document.getElementById('coachInput');
+  const send = document.getElementById('coachSendBtn');
+  const chat = document.getElementById('coachChat');
+  const status = document.getElementById('coachStatus');
+  const history=[];
+  const API_BASE=window.FOODSNAP_API_BASE||'';
+
+  function addMessage(message,type){
+    const row=document.createElement('div');
+    row.className='coach-message '+(type==='user'?'coach-user':'coach-ai');
+    if(type==='user') row.innerHTML='<div><strong>You</strong><p></p></div>';
+    else row.innerHTML='<div class="message-avatar">🤖</div><div><strong>FoodSnap Coach</strong><p></p></div>';
+    row.querySelector('p').textContent=message;
+    chat.appendChild(row); chat.scrollTop=chat.scrollHeight;
+  }
+  async function ask(){
+    const value=input.value.trim(); if(!value||send.disabled)return;
+    history.push({role:'user',content:value}); addMessage(value,'user'); input.value='';
+    send.disabled=true; status.textContent='FoodSnap Coach is thinking…';
+    try{
+      const response=await fetch(API_BASE+'/api/coach',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-10)})});
+      const data=await response.json();
+      if(!response.ok)throw new Error(data.error||'The AI Coach request failed.');
+      history.push({role:'assistant',content:data.reply}); addMessage(data.reply,'ai');
+      status.textContent='AI Coach connected to the FoodSnap server.';
+    }catch(error){
+      console.error(error); status.textContent='AI Coach needs the FoodSnap server and an AI model configured.'; addMessage(error.message,'ai');
+    }finally{send.disabled=false;}
+  }
+  if(nav&&section)nav.addEventListener('click',()=>section.scrollIntoView({behavior:'smooth',block:'start'}));
+  if(send)send.addEventListener('click',ask);
+  if(input)input.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&e.key==='Enter')ask();});
+  document.querySelectorAll('.coach-prompt').forEach(btn=>btn.addEventListener('click',()=>{input.value=btn.dataset.prompt||'';input.focus();}));
+})();
+
+/* Premium AI Workout Coach — server-backed generation */
+(function(){
+  const section=document.getElementById('workoutCoachSection');
+  const nav=document.getElementById('workoutCoachNavBtn');
+  const lock=document.getElementById('workoutPremiumLock');
+  const content=document.getElementById('workoutContent');
+  const unlock=document.getElementById('unlockWorkoutBtn');
+  const generate=document.getElementById('generateWorkoutBtn');
+  const result=document.getElementById('workoutResult');
+  const API_BASE=window.FOODSNAP_API_BASE||'';
+  function isPremium(){return Boolean(window.foodsnapIsPremium?.() || window.foodsnapPremiumActive);}
+  function openCheckout(){const modal=document.getElementById('premiumCheckoutModal');if(modal){modal.classList.add('show');modal.setAttribute('aria-hidden','false');}}
+  function refreshGate(){if(!lock||!content)return;const active=isPremium();lock.style.display=active?'none':'flex';content.style.display=active?'block':'none';}
+  function go(){if(section)section.scrollIntoView({behavior:'smooth',block:'start'});if(!isPremium())setTimeout(openCheckout,250);}
+  if(nav)nav.addEventListener('click',go); if(unlock)unlock.addEventListener('click',openCheckout);
+  const get=id=>document.getElementById(id)?.value||'';
+  async function generatePlan(){
+    const age=get('workoutAge'), exp=get('workoutExperience'), days=get('workoutDays'), time=get('workoutTime'), goal=get('workoutGoal'), place=get('workoutPlace'), equipment=get('workoutEquipment').trim();
+    if(!age||!exp||!days||!time||!goal||!place){alert('Please complete the activity profile first.');return;}
+    generate.disabled=true; generate.textContent='Creating your routine…';
+    try{
+      const res=await fetch(API_BASE+'/api/workout',{method:'POST',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({age,experience:exp,days:Number(days),minutes:Number(time),goal,place,equipment})});
+      const data=await res.json(); if(!res.ok)throw new Error(data.error||'Could not generate the workout plan.');
+      document.getElementById('workoutResultTitle').textContent=data.title||`${days}-day activity plan`;
+      document.getElementById('workoutResultIntro').textContent=data.intro||'Your plan is designed around your stated preferences.';
+      document.getElementById('workoutDaysGrid').innerHTML=(data.sessions||[]).map((s,i)=>`<div class="workout-day"><span class="day-tag">DAY ${i+1} · ${s.tag||'ACTIVITY'}</span><h4>${escapeHtml(s.title||'Movement session')}</h4><ul>${(s.items||[]).map(x=>`<li>${escapeHtml(x)}</li>`).join('')}</ul></div>`).join('');
+      result.style.display='block'; result.scrollIntoView({behavior:'smooth',block:'nearest'});
+    }catch(error){alert(error.message);}
+    finally{generate.disabled=false;generate.textContent='Generate My Routine';}
+  }
+  function escapeHtml(value){const div=document.createElement('div');div.textContent=String(value);return div.innerHTML;}
+  if(generate)generate.addEventListener('click',generatePlan);
+  const confirm=document.getElementById('confirmCheckoutBtn'); if(confirm)confirm.addEventListener('click',()=>setTimeout(refreshGate,100));
+  window.addEventListener('premium-state-changed',refreshGate); if(window.refreshPremiumState){window.refreshPremiumState().finally(refreshGate);} else refreshGate();
+})();
+
+</script>
+
+<div class="modal-backdrop" id="premiumCheckoutModal" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="premiumCheckoutTitle">
+    <button type="button" class="modal-close" id="closePremiumCheckout" aria-label="Close">×</button>
+    <span class="eyebrow">FOODSNAP PREMIUM</span>
+    <h2 id="premiumCheckoutTitle">Unlock Premium for $2</h2>
+    <p class="muted">Unlock the detailed habit guide, personalized food-improvement suggestions, and the Improve Estimate tool.</p>
+    <ul class="checkout-list">
+      <li>Personalized meal-balance suggestions</li><li><strong>Improve Estimate:</strong> refine portion size and sauce/dressing details</li>
+      <li>Simple food swaps and add-ons</li>
+      <li>Weekly healthy-habit checklist</li>
+      <li>Premium access is saved to your FoodSnap account</li>
+    </ul>
+    <div class="checkout-total"><span>Total</span><span>$2.00</span></div>
+    <button type="button" class="btn btn-primary" id="confirmCheckoutBtn">Pay $2 securely</button>
+    <p class="tiny muted">You will be redirected to Stripe Checkout to complete the payment securely. Your card details are entered on Stripe’s checkout page.</p>
+  </div>
+</div>
+
+
+<script>
+(function () {
+  const ids = ['wakeTime','breakfastTime','lunchTime','snackTime','dinnerTime'];
+  const labels = {
+    wakeTime: 'Wake up',
+    breakfastTime: 'Breakfast / first meal',
+    lunchTime: 'Lunch / midday meal',
+    snackTime: 'Optional snack',
+    dinnerTime: 'Dinner / evening meal'
+  };
+
+  function formatTime(value) {
+    if (!value) return 'Not set';
+    const [h, m] = value.split(':').map(Number);
+    const suffix = h >= 12 ? 'PM' : 'AM';
+    const hour = (h % 12) || 12;
+    return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
+  }
+
+  function renderSchedule() {
+    const list = document.getElementById('scheduleList');
+    if (!list) return;
+    list.className = 'schedule-list';
+    list.innerHTML = ids.map(id => {
+      const el = document.getElementById(id);
+      return `<div class="schedule-item"><span>${labels[id]}</span><strong>${formatTime(el.value)}</strong></div>`;
+    }).join('');
+  }
+
+  function saveSchedule() {
+    const data = {};
+    ids.forEach(id => data[id] = document.getElementById(id).value);
+    localStorage.setItem('foodsnapHealthSchedule', JSON.stringify(data));
+    renderSchedule();
+    const btn = document.getElementById('saveScheduleBtn');
+    if (btn) {
+      const old = btn.innerHTML;
+      btn.innerHTML = '✓ Saved';
+      setTimeout(() => btn.innerHTML = old, 1300);
+    }
+  }
+
+  function loadSchedule() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('foodsnapHealthSchedule') || 'null');
+      if (saved) ids.forEach(id => {
+        if (saved[id] && document.getElementById(id)) document.getElementById(id).value = saved[id];
+      });
+    } catch (_) {}
+    renderSchedule();
+  }
+
+  function suggestSchedule() {
+    // A flexible example routine, not a prescription.
+    const suggestions = {
+      wakeTime: '07:00',
+      breakfastTime: '08:00',
+      lunchTime: '12:30',
+      snackTime: '15:30',
+      dinnerTime: '18:30'
+    };
+    Object.entries(suggestions).forEach(([id, value]) => {
+      const el = document.getElementById(id);
+      if (el) el.value = value;
+    });
+    renderSchedule();
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    loadSchedule();
+    document.getElementById('saveScheduleBtn')?.addEventListener('click', saveSchedule);
+    document.getElementById('suggestScheduleBtn')?.addEventListener('click', suggestSchedule);
+    ids.forEach(id => document.getElementById(id)?.addEventListener('change', renderSchedule));
+  });
+})();
+</script>
+
+
+<script>
+(function () {
+  const alarmTime = document.getElementById('alarmTime');
+  const challengeType = document.getElementById('wakeChallengeType');
+  const setAlarmBtn = document.getElementById('setAlarmBtn');
+  const testAlarmBtn = document.getElementById('testAlarmBtn');
+  const stopAlarmBtn = document.getElementById('stopAlarmBtn');
+  const snoozeBtn = document.getElementById('snoozeBtn');
+  const challengeBtn = document.getElementById('challengeBtn');
+  const wakeStatus = document.getElementById('wakeStatus');
+  const alarmPanel = document.getElementById('wakeAlarmPanel');
+  const challengeText = document.getElementById('wakeChallengeText');
+  const challengeCount = document.getElementById('challengeCount');
+  const progressBar = document.getElementById('challengeProgressBar');
+
+  let alarmTimer = null;
+  let challengeTimer = null;
+  let challengeProgress = 0;
+  let challengeRequired = 5;
+  let alarmRunning = false;
+
+  const challenges = {
+    stretch: {
+      label: '30-second gentle stretch',
+      required: 30,
+      unit: 'seconds',
+      instruction: 'Gently stretch your arms and upper body for 30 seconds. Keep the movement comfortable.'
+    },
+    march: {
+      label: '30-second easy marching in place',
+      required: 30,
+      unit: 'seconds',
+      instruction: 'March gently in place for 30 seconds at a comfortable pace.'
+    },
+    mobility: {
+      label: '5 easy mobility movements',
+      required: 5,
+      unit: 'reps',
+      instruction: 'Complete 5 comfortable mobility movements, such as shoulder rolls or gentle side-to-side turns.'
+    },
+    breaths: {
+      label: '5 slow breaths + a gentle stretch',
+      required: 5,
+      unit: 'breaths',
+      instruction: 'Take 5 slow, comfortable breaths and finish with a gentle stretch.'
+    }
+  };
+
+  function saveSettings() {
+    localStorage.setItem('foodsnapWakeAlarm', JSON.stringify({
+      time: alarmTime.value,
+      challenge: challengeType.value
+    }));
+  }
+
+  function loadSettings() {
+    try {
+      const saved = JSON.parse(localStorage.getItem('foodsnapWakeAlarm') || 'null');
+      if (saved) {
+        if (saved.time) alarmTime.value = saved.time;
+        if (saved.challenge && challenges[saved.challenge]) challengeType.value = saved.challenge;
+      }
+    } catch (_) {}
+  }
+
+  function getChallenge() {
+    return challenges[challengeType.value] || challenges.mobility;
+  }
+
+  function updateChallengeText() {
+    const c = getChallenge();
+    challengeText.textContent = c.instruction;
+    challengeRequired = c.required;
+    challengeProgress = 0;
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const percent = Math.min(100, (challengeProgress / challengeRequired) * 100);
+    progressBar.style.width = percent + '%';
+    challengeCount.textContent = `${Math.min(challengeProgress, challengeRequired)} / ${challengeRequired}`;
+  }
+
+  function stopChallengeTimer() {
+    if (challengeTimer) {
+      clearInterval(challengeTimer);
+      challengeTimer = null;
+    }
+  }
+
+  function finishChallenge() {
+    stopChallengeTimer();
+    challengeProgress = challengeRequired;
+    updateProgress();
+    challengeBtn.disabled = true;
+    challengeBtn.textContent = '✓ Challenge complete';
+    wakeStatus.textContent = 'Nice work — the morning alarm is dismissed.';
+    stopAlarmSound();
+    alarmRunning = false;
+  }
+
+  // Browser-friendly visual/audio alarm. Browsers may block sound until the user interacts.
+  let audioCtx = null;
+  let soundTimer = null;
+
+  function startAlarmSound() {
+    try {
+      audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      stopAlarmSound();
+      soundTimer = setInterval(() => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.frequency.value = 880;
+        gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.08, audioCtx.currentTime + 0.03);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.28);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      }, 850);
+    } catch (_) {}
+  }
+
+  function stopAlarmSound() {
+    if (soundTimer) {
+      clearInterval(soundTimer);
+      soundTimer = null;
+    }
+  }
+
+  function triggerAlarm() {
+    alarmRunning = true;
+    alarmPanel.hidden = false;
+    challengeBtn.disabled = false;
+    challengeBtn.textContent = 'Start challenge';
+    updateChallengeText();
+    wakeStatus.textContent = '⏰ Your wake-up challenge is ready.';
+    startAlarmSound();
+    alarmPanel.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function setMorningAlarm() {
+    saveSettings();
+    if (alarmTimer) clearInterval(alarmTimer);
+
+    if (!alarmTime.value) {
+      wakeStatus.textContent = 'Choose a morning time first.';
+      return;
+    }
+
+    alarmTimer = setInterval(() => {
+      const now = new Date();
+      const current = now.toTimeString().slice(0, 5);
+      if (current === alarmTime.value && !alarmRunning) {
+        triggerAlarm();
+      }
+    }, 1000);
+
+    wakeStatus.textContent = `Morning alarm set for ${formatTime(alarmTime.value)}. Keep this page open for the browser timer to run.`;
+  }
+
+  function formatTime(value) {
+    const [h, m] = value.split(':').map(Number);
+    const suffix = h >= 12 ? 'PM' : 'AM';
+    const hour = (h % 12) || 12;
+    return `${hour}:${String(m).padStart(2, '0')} ${suffix}`;
+  }
+
+  function startChallenge() {
+    if (challengeTimer || !alarmRunning) return;
+    const c = getChallenge();
+
+    if (c.unit === 'seconds') {
+      challengeBtn.disabled = true;
+      challengeBtn.textContent = 'Challenge in progress…';
+      challengeTimer = setInterval(() => {
+        challengeProgress++;
+        updateProgress();
+        if (challengeProgress >= challengeRequired) finishChallenge();
+      }, 1000);
+    } else {
+      challengeProgress++;
+      updateProgress();
+      if (challengeProgress >= challengeRequired) finishChallenge();
+    }
+  }
+
+  function snoozeAlarm() {
+    stopAlarmSound();
+    stopChallengeTimer();
+    alarmPanel.hidden = true;
+    alarmRunning = false;
+    challengeProgress = 0;
+
+    wakeStatus.textContent = 'Snoozed for 5 minutes.';
+    setTimeout(() => {
+      triggerAlarm();
+    }, 5 * 60 * 1000);
+  }
+
+  function stopAlarm() {
+    stopAlarmSound();
+    stopChallengeTimer();
+    alarmPanel.hidden = true;
+    alarmRunning = false;
+    challengeProgress = 0;
+    wakeStatus.textContent = 'Alarm stopped. You can set it again anytime.';
+  }
+
+  loadSettings();
+  updateChallengeText();
+
+  setAlarmBtn?.addEventListener('click', setMorningAlarm);
+  testAlarmBtn?.addEventListener('click', triggerAlarm);
+  stopAlarmBtn?.addEventListener('click', stopAlarm);
+  snoozeBtn?.addEventListener('click', snoozeAlarm);
+  challengeBtn?.addEventListener('click', startChallenge);
+  challengeType?.addEventListener('change', updateChallengeText);
+  alarmTime?.addEventListener('change', saveSettings);
+})();
+</script>
+
+
+<!-- FoodSnap Premium Subscription Page -->
+<div id="premiumPage" class="premium-page" hidden aria-hidden="true">
+  <div class="premium-page-inner">
+    <button type="button" class="premium-close" id="premiumCloseBtn" aria-label="Close Premium page">×</button>
+
+    <div class="premium-hero">
+      <div class="premium-crown">✦</div>
+      <span class="eyebrow">FOODSNAP PREMIUM</span>
+      <h1>More from your food & health coach</h1>
+      <p>Get the extra tools that make FoodSnap easier to use every day with one simple purchase.</p>
+
+      <div class="premium-price-card">
+        <div>
+          <span class="premium-price">$2</span>
+          <span class="premium-period">one-time</span>
+        </div>
+        <span class="premium-small">Cancel anytime</span>
+      </div>
+
+      <button type="button" class="btn btn-premium-large" id="premiumUpgradeBtn">
+        ✨ Continue for $2
+      </button>
+      <p class="premium-secure-note">Secure checkout powered by Stripe. FoodSnap never receives or stores your card number.</p>
+    </div>
+
+    <div class="premium-feature-grid">
+      <article class="premium-feature">
+        <div class="premium-feature-icon">📸</div>
+        <h3>Improve Estimate</h3>
+        <p>Get an extra refinement step for food scan estimates in the production-ready PWA.</p>
+      </article>
+
+      <article class="premium-feature">
+        <div class="premium-feature-icon">🤖</div>
+        <h3>AI Health Coach</h3>
+        <p>Use personalized habit and routine guidance based on what you tell FoodSnap.</p>
+      </article>
+
+      <article class="premium-feature">
+        <div class="premium-feature-icon">🏋️</div>
+        <h3>Workout Coach</h3>
+        <p>Create age-appropriate activity routines around your experience, schedule, and available equipment.</p>
+      </article>
+
+      <article class="premium-feature">
+        <div class="premium-feature-icon">⏰</div>
+        <h3>Wake-Up Challenge</h3>
+        <p>Set a morning alarm with a short, gentle movement challenge to help you get started.</p>
+      </article>
+
+      <article class="premium-feature">
+        <div class="premium-feature-icon">🥗</div>
+        <h3>Daily Food Routine</h3>
+        <p>Save your preferred wake-up and meal times and keep a consistent routine.</p>
+      </article>
+
+      <article class="premium-feature">
+        <div class="premium-feature-icon">📊</div>
+        <h3>Personal Progress</h3>
+        <p>Keep your FoodSnap history organized under your account and build useful habits over time.</p>
+      </article>
+    </div>
+
+    <div class="premium-details">
+      <h2>What you get for $2</h2>
+      <ul>
+        <li>All Premium features in one simple one-time purchase</li>
+        <li>Premium tools available across your FoodSnap account</li>
+        <li>No need to purchase each Premium feature separately</li>
+        <li>Premium access stays attached to your account after purchase</li>
+      </ul>
+    </div>
+
+    <div class="premium-faq">
+      <h2>Premium FAQ</h2>
+      <details>
+        <summary>Is this a real $2 charge?</summary>
+        <p>Yes. The upgrade button sends you to Stripe Checkout, where the $2 one-time payment is processed securely.</p>
+      </details>
+      <details>
+        <summary>What happens after I upgrade?</summary>
+        <p>After Stripe confirms payment, Premium is activated on your signed-in FoodSnap account.</p>
+      </details>
+      <details>
+        <summary>What if I change my mind?</summary>
+        <p>This is a one-time purchase, not a recurring subscription.</p>
+      </details>
+    </div>
+
+    <div class="premium-bottom-cta">
+      <strong>Ready to unlock FoodSnap Premium?</strong>
+      <button type="button" class="btn btn-premium-large" id="premiumBottomUpgradeBtn">Get Premium — $2</button>
+    </div>
+  </div>
+</div>
+
+<div id="premiumConfirmModal" class="premium-confirm-modal" hidden aria-hidden="true">
+  <div class="premium-confirm-card">
+    <button type="button" class="premium-close small" id="premiumConfirmClose" aria-label="Close">×</button>
+    <div class="premium-crown">✦</div>
+    <h2>FoodSnap Premium</h2>
+    <p class="confirm-price"><strong>$2</strong> / month</p>
+    <p>Stripe Checkout handles the payment securely on its hosted checkout page.</p>
+    <button type="button" class="btn btn-premium-large" id="confirmPremiumBtn">Pay $2 securely</button>
+    <button type="button" class="btn btn-secondary" id="cancelPremiumBtn">Go back</button>
+  </div>
+</div>
+
+<style>
+  .premium-page {
+    position: fixed;
+    inset: 0;
+    z-index: 9990;
+    overflow-y: auto;
+    background: linear-gradient(180deg, #f6fff8 0%, #ffffff 42%, #f7faf8 100%);
+  }
+  .premium-page[hidden], .premium-confirm-modal[hidden] {
+    display: none;
+  }
+  .premium-page-inner {
+    width: min(1080px, calc(100% - 32px));
+    margin: 0 auto;
+    padding: 34px 0 60px;
+    position: relative;
+  }
+  .premium-close {
+    position: sticky;
+    top: 16px;
+    margin-left: auto;
+    display: flex;
+    width: 46px;
+    height: 46px;
+    min-height: 46px;
+    padding: 0;
+    border: 1px solid rgba(0,0,0,.1);
+    border-radius: 50%;
+    background: rgba(255,255,255,.9);
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .premium-close.small {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+  }
+  .premium-hero {
+    max-width: 760px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 18px 10px 36px;
+  }
+  .premium-crown {
+    width: 62px;
+    height: 62px;
+    margin: 0 auto 16px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    background: linear-gradient(135deg, #d9f99d, #86efac);
+    box-shadow: 0 12px 30px rgba(22,101,52,.15);
+  }
+  .premium-hero h1 {
+    margin: 8px 0 12px;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    line-height: 1.05;
+  }
+  .premium-hero p {
+    font-size: 1.05rem;
+    opacity: .78;
+  }
+  .premium-price-card {
+    width: min(420px, 100%);
+    margin: 24px auto 18px;
+    padding: 20px;
+    border-radius: 22px;
+    background: #fff;
+    border: 1px solid rgba(34,197,94,.2);
+    box-shadow: 0 16px 40px rgba(15,23,42,.08);
+  }
+  .premium-price {
+    font-size: 3rem;
+    font-weight: 850;
+    letter-spacing: -1px;
+  }
+  .premium-period {
+    font-size: 1rem;
+    opacity: .65;
+  }
+  .premium-small {
+    display: block;
+    margin-top: 3px;
+    font-size: .85rem;
+    opacity: .65;
+  }
+  .btn-premium-large {
+    width: min(440px, 100%);
+    min-height: 54px;
+    padding: 14px 22px;
+    border: 0;
+    border-radius: 16px;
+    color: #fff;
+    background: linear-gradient(135deg, #16a34a, #22c55e);
+    box-shadow: 0 12px 26px rgba(22,163,74,.24);
+    font-weight: 800;
+  }
+  .premium-secure-note {
+    font-size: .78rem !important;
+    margin-top: 10px;
+    opacity: .55 !important;
+  }
+  .premium-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+  .premium-feature {
+    padding: 22px;
+    border-radius: 20px;
+    background: rgba(255,255,255,.9);
+    border: 1px solid rgba(15,23,42,.07);
+    box-shadow: 0 8px 24px rgba(15,23,42,.055);
+    transition: transform .2s ease, box-shadow .2s ease;
+  }
+  .premium-feature:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 16px 32px rgba(15,23,42,.09);
+  }
+  .premium-feature-icon {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+  .premium-feature h3 {
+    margin: 0 0 7px;
+  }
+  .premium-feature p {
+    margin: 0;
+    line-height: 1.55;
+    opacity: .74;
+  }
+  .premium-details, .premium-faq {
+    margin-top: 26px;
+    padding: 26px;
+    border-radius: 20px;
+    background: #fff;
+    border: 1px solid rgba(15,23,42,.07);
+  }
+  .premium-details h2, .premium-faq h2 {
+    margin-top: 0;
+  }
+  .premium-details li {
+    margin: 10px 0;
+  }
+  .premium-faq details {
+    padding: 15px 0;
+    border-top: 1px solid rgba(15,23,42,.08);
+  }
+  .premium-faq summary {
+    cursor: pointer;
+    font-weight: 700;
+  }
+  .premium-faq p {
+    margin-bottom: 0;
+    opacity: .72;
+  }
+  .premium-bottom-cta {
+    margin-top: 26px;
+    padding: 26px;
+    border-radius: 22px;
+    text-align: center;
+    background: linear-gradient(135deg, rgba(34,197,94,.12), rgba(134,239,172,.22));
+  }
+  .premium-bottom-cta strong {
+    display: block;
+    margin-bottom: 15px;
+    font-size: 1.15rem;
+  }
+  .premium-confirm-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: grid;
+    place-items: center;
+    padding: 18px;
+    background: rgba(15,23,42,.58);
+    backdrop-filter: blur(5px);
+  }
+  .premium-confirm-card {
+    position: relative;
+    width: min(460px, 100%);
+    padding: 32px;
+    text-align: center;
+    border-radius: 24px;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(0,0,0,.22);
+  }
+  .confirm-price {
+    font-size: 1.35rem;
+  }
+  .confirm-price strong {
+    font-size: 2rem;
+  }
+  .premium-confirm-card .btn {
+    width: 100%;
+    margin-top: 10px;
+  }
+  @media (max-width: 800px) {
+    .premium-feature-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 560px) {
+    .premium-page-inner {
+      width: min(100% - 22px, 1080px);
+      padding-top: 18px;
+    }
+    .premium-feature-grid {
+      grid-template-columns: 1fr;
+    }
+    .premium-hero {
+      padding-top: 12px;
+    }
+    .premium-confirm-card {
+      padding: 26px 20px;
+    }
+  }
+
+<style>
+  /* Home navigation: keep History, Workout Routines, and AI Coach together */
+  nav {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  nav .nav-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px;
+    padding: 9px 13px;
+    border-radius: 12px;
+    text-decoration: none;
+    white-space: nowrap;
+    line-height: 1.1;
+    box-sizing: border-box;
+  }
+  @media (max-width: 850px) {
+    nav {
+      gap: 6px;
+    }
+    nav .nav-link {
+      padding: 8px 10px;
+      font-size: .9rem;
+    }
+  }
+  @media (max-width: 650px) {
+    nav .nav-link {
+      white-space: normal;
+      text-align: center;
+      min-height: 42px;
+    }
+  }
+</style>
+
+</style>
+
+
+<script>
+(function () {
+  const premiumPage = document.getElementById('premiumPage');
+  const premiumConfirmModal = document.getElementById('premiumConfirmModal');
+  const closePage = document.getElementById('premiumCloseBtn');
+  const upgradeButtons = [
+    document.getElementById('premiumUpgradeBtn'),
+    document.getElementById('premiumBottomUpgradeBtn'),
+    document.getElementById('confirmPremiumBtn')
+  ].filter(Boolean);
+  const cancelBtn = document.getElementById('cancelPremiumBtn');
+  const confirmClose = document.getElementById('premiumConfirmClose');
+
+  function closeLegacyPage(){
+    if(!premiumPage) return;
+    premiumPage.hidden=true;
+    premiumPage.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  }
+  function openRealCheckout(){
+    closeLegacyPage();
+    premiumConfirmModal?.setAttribute('hidden','');
+    premiumConfirmModal?.setAttribute('aria-hidden','true');
+    if(typeof window.openFoodSnapPremiumCheckout==='function') window.openFoodSnapPremiumCheckout();
+  }
+
+  // Preserve compatibility with the older Premium screen, but route every purchase action
+  // through the real Stripe checkout instead of the old demo flow.
+  upgradeButtons.forEach(btn=>btn.addEventListener('click',openRealCheckout));
+  closePage?.addEventListener('click',closeLegacyPage);
+  cancelBtn?.addEventListener('click',closeLegacyPage);
+  confirmClose?.addEventListener('click',closeLegacyPage);
+  premiumConfirmModal?.addEventListener('click',event=>{if(event.target===premiumConfirmModal)closeLegacyPage();});
+})();
+</script>
+
+
+<script>
+(function () {
+  const routines = {
+    full: {
+      title: 'Full-Body Strength Routine',
+      intro: 'A balanced routine that works several major muscle groups without needing heavy equipment.',
+      exercises: [
+        ['Chair or bodyweight squats', '2 sets × 8–12'],
+        ['Wall or incline push-ups', '2 sets × 6–12'],
+        ['Glute bridges', '2 sets × 8–12'],
+        ['Bird dogs', '2 sets × 6 each side'],
+        ['Easy marching in place', '2 × 30 seconds']
+      ]
+    },
+    legs: {
+      title: 'Leg Strength Routine',
+      intro: 'A simple lower-body routine focused on controlled movement and good form.',
+      exercises: [
+        ['Bodyweight squats', '2 sets × 8–12'],
+        ['Reverse lunges or supported lunges', '2 sets × 6 each side'],
+        ['Glute bridges', '2 sets × 8–12'],
+        ['Calf raises', '2 sets × 10–15'],
+        ['Wall sit', '2 × 15–30 seconds']
+      ]
+    },
+    chest: {
+      title: 'Chest Strength Routine',
+      intro: 'A gradual pushing routine with easier options available for beginners.',
+      exercises: [
+        ['Wall push-ups', '2 sets × 8–12'],
+        ['Incline push-ups', '2 sets × 6–12'],
+        ['Knee push-ups if comfortable', '1–2 sets × 5–10'],
+        ['Plank shoulder taps', '2 sets × 6 each side']
+      ]
+    },
+    back: {
+      title: 'Back & Posture Routine',
+      intro: 'Gentle exercises for upper-back strength and posture support.',
+      exercises: [
+        ['Bird dogs', '2 sets × 6 each side'],
+        ['Wall angels', '2 sets × 6–10'],
+        ['Prone Y raises', '2 sets × 6–10'],
+        ['Resistance-band rows if available', '2 sets × 8–12']
+      ]
+    },
+    shoulders: {
+      title: 'Shoulder Strength Routine',
+      intro: 'Controlled shoulder movements using bodyweight or light resistance.',
+      exercises: [
+        ['Wall angels', '2 sets × 6–10'],
+        ['Incline push-ups', '2 sets × 6–12'],
+        ['Light lateral raises if equipment is available', '2 sets × 8–12'],
+        ['Arm circles', '2 × 20 seconds']
+      ]
+    },
+    core: {
+      title: 'Core Stability Routine',
+      intro: 'Focuses on controlled core stability rather than trying to train to exhaustion.',
+      exercises: [
+        ['Dead bugs', '2 sets × 6 each side'],
+        ['Bird dogs', '2 sets × 6 each side'],
+        ['Modified plank', '2 × 15–30 seconds'],
+        ['Glute bridges', '2 sets × 8–12']
+      ]
+    },
+    arms: {
+      title: 'Arm Strength Routine',
+      intro: 'A simple upper-body routine using bodyweight and optional light resistance.',
+      exercises: [
+        ['Wall or incline push-ups', '2 sets × 6–12'],
+        ['Light biceps curls if equipment is available', '2 sets × 8–12'],
+        ['Light triceps extensions if equipment is available', '2 sets × 8–12'],
+        ['Plank shoulder taps', '2 sets × 6 each side']
+      ]
+    }
+  };
+
+  function renderRoutine(key) {
+    const routine = routines[key] || routines.full;
+    const result = document.getElementById('routineResult');
+    if (!result) return;
+
+    result.innerHTML = `
+      <h3>${routine.title}</h3>
+      <p>${routine.intro}</p>
+      <div class="routine-list">
+        ${routine.exercises.map(ex => `
+          <div class="routine-exercise">
+            <strong>${ex[0]}</strong>
+            <span class="routine-meta">${ex[1]}</span>
+          </div>
+        `).join('')}
+      </div>
+      <p class="routine-note">
+        Start easy and focus on comfortable technique. Take rest when you need it.
+        This is general fitness guidance, not a medical or individualized training prescription.
+      </p>
+      <div class="routine-coach-link">
+        <a href="#ai-coach" class="btn btn-secondary">🤖 Ask AI Coach about this routine</a>
+      </div>
+    `;
+  }
+
+  document.querySelectorAll('.muscle-choice').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.muscle-choice').forEach(b => b.classList.remove('active'));
+      button.classList.add('active');
+      renderRoutine(button.dataset.muscle);
+    });
+  });
+
+  renderRoutine('full');
+})();
+</script>
+
+
+<script>
+(function () {
+  // Keep every same-page navigation link functional even when sections are hidden/collapsed.
+  document.addEventListener('click', function (e) {
+    const link = e.target.closest('a[href^="#"]');
+    if (!link) return;
+    const id = link.getAttribute('href');
+    if (!id || id === '#') return;
+    const target = document.querySelector(id);
+    if (!target) return;
+    e.preventDefault();
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // Make generic close/cancel buttons reliably dismiss their nearest modal/panel.
+  document.addEventListener('click', function (e) {
+    const btn = e.target.closest('[data-close], .modal-close, .close-modal');
+    if (!btn) return;
+    const selector = btn.getAttribute('data-close');
+    let target = selector ? document.querySelector(selector) : btn.closest('.modal, [role="dialog"], .overlay');
+    if (target) {
+      target.classList.remove('show', 'active', 'open');
+      target.style.display = 'none';
+    }
+  });
+
+  // Escape closes visible dialogs.
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll('.modal.show, .modal.active, .modal.open, [role="dialog"].show, [role="dialog"].active')
+      .forEach(function (el) { el.classList.remove('show','active','open'); el.style.display='none'; });
+  });
+
+  // Prevent demo buttons from doing nothing when no handler exists.
+  document.querySelectorAll('button').forEach(function (btn) {
+    if (btn.dataset.safeBound) return;
+    const label = (btn.textContent || '').trim().toLowerCase();
+    if (!label) return;
+    if (label === 'learn more' && !btn.onclick) {
+      btn.addEventListener('click', function () {
+        const target = document.querySelector('#how') || document.querySelector('#how-it-works');
+        if (target) target.scrollIntoView({behavior:'smooth'});
+      });
+    }
+    if ((label === 'scan another food' || label === 'scan again') && !btn.onclick) {
+      btn.addEventListener('click', function () {
+        const scanner = document.querySelector('#scanner');
+        if (scanner) scanner.scrollIntoView({behavior:'smooth'});
+      });
+    }
+    btn.dataset.safeBound = '1';
+  });
+})();
+</script>
+
+</body>
+</html>

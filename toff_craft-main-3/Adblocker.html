@@ -1,0 +1,382 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdBlock Guide | Browse with Less Distraction</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #0b1020;
+      --card: #151d31;
+      --accent: #7c6cff;
+      --text: #f5f7ff;
+      --muted: #aab4ca;
+      --border: #28334b;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(1100px, 90%);
+      margin: auto;
+    }
+
+    header {
+      padding: 22px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo {
+      font-size: 21px;
+      font-weight: 800;
+    }
+
+    .logo span {
+      color: #9c91ff;
+    }
+
+    .nav-link {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 85px 0 65px;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #201e42;
+      color: #c1baff;
+      border: 1px solid #454078;
+      border-radius: 50px;
+      padding: 7px 15px;
+      font-size: 13px;
+      margin-bottom: 23px;
+    }
+
+    h1 {
+      font-size: clamp(36px, 6vw, 64px);
+      line-height: 1.12;
+      letter-spacing: -2px;
+      margin-bottom: 20px;
+    }
+
+    h1 span {
+      color: #a398ff;
+    }
+
+    .hero p {
+      max-width: 620px;
+      margin: 0 auto 30px;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .button {
+      display: inline-block;
+      background: var(--accent);
+      color: white;
+      padding: 14px 23px;
+      border-radius: 12px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+      transition: transform .2s, background .2s;
+    }
+
+    .button:hover {
+      background: #9387ff;
+      transform: translateY(-3px);
+    }
+
+    .button:focus-visible,
+    a:focus-visible {
+      outline: 3px solid #c2bbff;
+      outline-offset: 4px;
+    }
+
+    .secondary {
+      background: transparent;
+      border: 1px solid #424c65;
+      margin-left: 8px;
+    }
+
+    .secondary:hover {
+      background: #202a40;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 17px;
+    }
+
+    section {
+      padding: 50px 0;
+    }
+
+    .section-heading {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .section-heading h2 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .section-heading p {
+      color: var(--muted);
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .step {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 25px;
+      transition: transform .2s, border-color .2s;
+    }
+
+    .step:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+    }
+
+    .number {
+      display: grid;
+      place-items: center;
+      width: 43px;
+      height: 43px;
+      border-radius: 12px;
+      background: #29254e;
+      color: #c1baff;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+
+    .step h3 {
+      margin-bottom: 10px;
+      font-size: 18px;
+    }
+
+    .step p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .tip {
+      background: linear-gradient(135deg, #1c2340, #201d43);
+      border: 1px solid #39365f;
+      border-radius: 18px;
+      padding: 28px;
+      margin-top: 25px;
+    }
+
+    .tip h3 {
+      margin-bottom: 8px;
+    }
+
+    .tip p {
+      color: var(--muted);
+    }
+
+    .tip a {
+      color: #c1baff;
+      text-decoration: underline;
+    }
+
+    .final-cta {
+      text-align: center;
+      padding: 45px 20px;
+      margin: 25px 0 55px;
+      border-radius: 22px;
+      border: 1px solid var(--border);
+      background: #121a2c;
+    }
+
+    .final-cta h2 {
+      margin-bottom: 10px;
+      font-size: 28px;
+    }
+
+    .final-cta p {
+      color: var(--muted);
+      margin-bottom: 23px;
+    }
+
+    footer {
+      padding: 25px 0;
+      text-align: center;
+      color: var(--muted);
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    @media (max-width: 750px) {
+      .steps {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        padding-top: 60px;
+      }
+
+      .secondary {
+        margin: 12px 0 0;
+      }
+
+      .hero .button {
+        display: block;
+        width: 100%;
+        max-width: 330px;
+        margin: 10px auto;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <nav class="container">
+      <a class="logo" href="#">Ad<span>Guide</span></a>
+      <a class="nav-link" href="#steps">Installation guide ↓</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero container">
+      <div class="tag">✦ Simple setup · Beginner friendly</div>
+
+      <h1>Browse with <span>fewer ads.</span></h1>
+
+      <p>
+        Learn how to install AdBlock on Google Chrome in just a few
+        simple steps. No coding or technical experience required. I use this add block to. 
+      </p>
+
+      <a
+        class="button"
+        href="https://chromewebstore.google.com/detail/adblock-%E2%80%94-block-ads-acros/gighmmpiobklfepjocnamgkkbiglidom?hl=en"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        Get AdBlock ↗
+      </a>
+
+      <a class="button secondary" href="#steps">
+        How it works
+      </a>
+
+      <div class="note">
+        Opens the official Chrome Web Store listing.
+      </div>
+    </section>
+
+    <section class="container" id="steps">
+      <div class="section-heading">
+        <h2>Install in 3 easy steps</h2>
+        <p>Follow these instructions to get started.</p>
+      </div>
+
+      <div class="steps">
+        <article class="step">
+          <div class="number">01</div>
+          <h3>Open the store</h3>
+          <p>
+            Click the "Get AdBlock" button above to open AdBlock's
+            listing in the Chrome Web Store. It is not blocked on school computor.
+          </p>
+        </article>
+
+        <article class="step">
+          <div class="number">02</div>
+          <h3>Add the extension</h3>
+          <p>
+            Click "Add to Chrome" on the listing. Review the
+            permissions and select "Add extension" if you agree.
+          </p>
+        </article>
+
+        <article class="step">
+          <div class="number">03</div>
+          <h3>Start browsing</h3>
+          <p>
+            Once installation finishes, visit a website.
+            AdBlock can begin filtering ads automatically.
+          </p>
+        </article>
+      </div>
+
+      <div class="tip">
+        <h3>💡 Helpful tip</h3>
+        <p>
+          Can't find the AdBlock icon? Click the puzzle-piece
+          Extensions button near Chrome's address bar. You can
+          pin AdBlock there for easier access.
+        </p>
+      </div>
+    </section>
+
+    <section class="container">
+      <div class="final-cta">
+        <h2>Ready to get started?</h2>
+        <p>
+          Head to the official listing and follow the installation
+          instructions.
+        </p>
+
+        <a
+          class="button"
+          href="https://chromewebstore.google.com/detail/adblock-%E2%80%94-block-ads-acros/gighmmpiobklfepjocnamgkkbiglidom?hl=en"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Install AdBlock ↗
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      AdGuide is an independent installation guide and is not
+      affiliated with AdBlock, Inc. or Google.
+    </div>
+  </footer>
+</body>
+</html>
