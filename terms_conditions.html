@@ -8,28 +8,28 @@
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       line-height: 1.7;
-      color: #e0e0e0;
+      color: #cbd5e1; /* Smooth light slate color for text */
       max-width: 800px;
       margin: 40px auto;
       padding: 0 24px;
-      background-color: #121212;
+      background-color: #0b0f19; /* Very dark deep space blue */
     }
     h1 {
       color: #ffffff;
       font-size: 2.5rem;
-      border-bottom: 2px solid #ffcc00;
+      border-bottom: 2px solid #3b82f6; /* Electric Blue border */
       padding-bottom: 12px;
       margin-bottom: 25px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-    /* Single Master Content Box */
+    /* Single Master Content Box styled in Deep Cyber Blue */
     .master-container-box {
-      background-color: #1e1e24;
+      background-color: #111827; /* Rich dark blue-gray */
       padding: 30px;
-      border-left: 5px solid #ffcc00;
+      border-left: 5px solid #3b82f6; /* Electric Blue accent bar */
       border-radius: 6px;
-      border: 1px solid #2d2d35;
+      border: 1px solid #1e293b;
       border-left-width: 5px;
     }
     h2 {
@@ -45,7 +45,7 @@
     }
     p, li {
       font-size: 1rem;
-      color: #cccccc;
+      color: #94a3b8;
     }
     ul {
       padding-left: 20px;
@@ -53,7 +53,7 @@
     li {
       margin-bottom: 12px;
     }
-    /* Bright Yellow Highlight for Main Points */
+    /* Bright Yellow Highlight for Main Points as requested */
     .yellow-highlight {
       color: #ffcc00;
       font-weight: bold;
@@ -62,24 +62,27 @@
       margin-top: 40px;
       text-align: center;
       padding: 20px;
-      background-color: #1a1a1a;
+      background-color: #0f172a; /* Complementary dark container */
       border-radius: 8px;
-      border: 1px solid #333;
+      border: 1px solid #1e293b;
     }
+    /* Updated Button Styles featuring the blue theme accents */
     .btn-agree {
-      background-color: #ffcc00;
-      color: #111;
-      font-size: 1.2rem;
+      background-color: #3b82f6; /* Electric Blue Button */
+      color: #ffffff;
+      font-size: 1.1rem;
       font-weight: bold;
-      padding: 12px 40px;
+      padding: 14px 35px;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      transition: background-color 0.2s, transform 0.1s;
+      transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
       text-transform: uppercase;
+      letter-spacing: 0.5px;
     }
     .btn-agree:hover {
-      background-color: #ffe066;
+      background-color: #60a5fa; /* Lighter bright blue on hover */
+      box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
       transform: translateY(-1px);
     }
     .btn-agree:active {
@@ -100,7 +103,7 @@
     <ul>
       <li><span class="yellow-highlight">BREAKTIME USE ONLY:</span> This game website should only be used on breaktime, not during classes. Focus on your education and respect your study hours!</li>
       <li><span class="yellow-highlight">NO BOTS ALLOWED:</span> The use of automated scripts, bots, macros, or scrapers to play or manipulate our games is strictly prohibited. Violators could face an IP ban from toffcrafts website.</li>
-      <li><span class="yellow-highlight">NO ACCOUNTS / CLEARING COOKIES WILL DELETE YOUR PROGRESS(EXEPT EAGLERCRAFT):</span> Because this platform operates completely without user accounts, all game progress and top scores are saved locally in your browser cache. Clearing your cookies will reset your data.</li>
+      <li><span class="yellow-highlight">NO ACCOUNTS / CLEARING COOKIES WILL DELETE YOUR PROGRESS (EXCEPT EAGLERCRAFT):</span> Because this platform operates completely without user accounts, all game progress and top scores are saved locally in your browser cache. Clearing your cookies will reset your data.</li>
     </ul>
 
     <h2>1. General Conduct</h2>
@@ -116,7 +119,8 @@
 
   <div class="action-container">
     <p style="margin-bottom: 20px;">By clicking below, you certify that you are a human playing on a break, and agree to all terms stated above.</p>
-    <button class="btn-agree" onclick="alert('Thank you for accepting the terms! Redirecting to the game lobby...'); window.location.href='#game-lobby';">I Agree</button>
+    <!-- Text updated below -->
+    <button class="btn-agree" onclick="alert('Thank you for accepting the terms! Redirecting to the game lobby...'); window.location.href='#game-lobby';">I AGREE TO THE TERMS OF SERVICE</button>
   </div>
 
 </body>
