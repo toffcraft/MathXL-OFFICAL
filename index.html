@@ -469,7 +469,43 @@ overflow: hidden;
           noticeOverlay.classList.remove('visible');
           window.setTimeout(() => noticeOverlay.remove(), 300);
         });
-        window.setTimeout(() => noticeOverlay.classList.add('visible'), 2000);
+        // Terms of Service popup. Acceptance is remembered when browser storage is available.
+        const termsStyle = document.createElement('style');
+        termsStyle.textContent = '#toff-terms-overlay{position:fixed;inset:0;z-index:3000000;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(2,8,23,.88);backdrop-filter:blur(7px);opacity:0;visibility:hidden;transition:opacity .25s ease,visibility .25s ease}#toff-terms-overlay.visible{opacity:1;visibility:visible}#toff-terms-card{width:min(100%,780px);max-height:90vh;overflow:auto;padding:28px;border:1px solid #1e293b;border-left:5px solid #3b82f6;border-radius:12px;background:#111827;color:#cbd5e1;line-height:1.7;box-shadow:0 24px 80px rgba(0,0,0,.6)}#toff-terms-card h2{margin:0 0 18px;color:#fff;font-size:1.9rem;border-bottom:2px solid #3b82f6;padding-bottom:12px}#toff-terms-card h3{margin:24px 0 8px;color:#fff;font-size:1.08rem;text-transform:uppercase;letter-spacing:.3px}#toff-terms-card p,#toff-terms-card li{color:#a5b4cf;font-size:.95rem}#toff-terms-card li{margin-bottom:9px}#toff-terms-card .terms-highlight{color:#ffcc00;font-weight:800}#toff-terms-actions{position:sticky;bottom:-28px;margin:20px -28px -28px;padding:18px 28px;background:#0f172a;border-top:1px solid #1e293b;text-align:center}#toff-terms-actions p{margin:0 0 14px}#toff-terms-agree{border:0;border-radius:6px;background:#3b82f6;color:#fff;padding:13px 22px;font-size:1rem;font-weight:800;letter-spacing:.3px;cursor:pointer}#toff-terms-agree:hover{background:#60a5fa;box-shadow:0 0 15px rgba(59,130,246,.4)}#toff-terms-cancel{margin-left:10px;border:1px solid #64748b;border-radius:6px;background:#334155;color:#f8fafc;padding:13px 22px;font-size:1rem;font-weight:800;letter-spacing:.3px;cursor:pointer}#toff-terms-cancel:hover{background:#475569}@media(max-width:520px){#toff-terms-card{padding:20px}#toff-terms-card h2{font-size:1.5rem}#toff-terms-actions{bottom:-20px;margin:18px -20px -20px;padding:16px 20px}}';
+        document.head.appendChild(termsStyle);
+
+        const termsOverlay = document.createElement('div');
+        termsOverlay.id = 'toff-terms-overlay';
+        termsOverlay.setAttribute('role', 'dialog');
+        termsOverlay.setAttribute('aria-modal', 'true');
+        termsOverlay.setAttribute('aria-labelledby', 'toff-terms-title');
+        termsOverlay.innerHTML = '<div id="toff-terms-card" tabindex="-1"><h2 id="toff-terms-title">📜 Terms of Service</h2><h3>⚠️ Platform Rules & Agreement</h3><p>Welcome to Toff Craft. By using this platform, you agree to follow these guidelines. Violations may result in restricted access.</p><ul><li><span class="terms-highlight">BREAKTIME USE ONLY:</span> Use this game website during break time, not during classes. Focus on your education and respect study hours.</li><li><span class="terms-highlight">NO BOTS ALLOWED:</span> Do not use automated scripts, bots, macros, or scrapers to play or manipulate games. Violations may result in a site ban.</li><li><span class="terms-highlight">NO ACCOUNTS / LOCAL SAVES:</span> This platform does not provide user accounts. Game progress and scores may be saved locally by each game in your browser. Clearing browser data may delete progress. Eaglercraft may handle saves differently.</li></ul><h3>1. General Conduct</h3><p>Keep the experience fun and fair. Attempts to disrupt other players or crash the site may result in being blocked.</p><h3>2. Intellectual Property</h3><p>Game assets and third-party content may belong to their respective owners. Do not redistribute content unless you have permission.</p><h3>3. Disclaimer</h3><p>Toff Craft is provided on an “as-is” basis. Availability, game functionality, and saved data are not guaranteed; interruptions or data loss may occur.</p><div id="toff-terms-actions"><p>By clicking below, you confirm that you have read and agree to these terms.</p><button id="toff-terms-agree" type="button">I AGREE TO THE TERMS OF SERVICE</button><button id="toff-terms-cancel" type="button">CANCEL</button></div></div>';
+        document.body.appendChild(termsOverlay);
+
+        const termsAcceptedKey = 'toffCraftTermsAcceptedV1';
+        let termsAccepted = false;
+        try { termsAccepted = localStorage.getItem(termsAcceptedKey) === 'yes'; } catch (err) {}
+        const showAdBlockNotice = () => window.setTimeout(() => noticeOverlay.classList.add('visible'), 2000);
+
+        if (!termsAccepted) {
+          window.setTimeout(() => termsOverlay.classList.add('visible'), 100);
+        } else {
+          showAdBlockNotice();
+        }
+
+        document.getElementById('toff-terms-cancel').addEventListener('click', () => {
+          window.location.replace('https://www.google.com');
+        });
+
+        document.getElementById('toff-terms-agree').addEventListener('click', () => {
+          try { localStorage.setItem(termsAcceptedKey, 'yes'); } catch (err) {}
+          termsOverlay.classList.remove('visible');
+          window.setTimeout(() => {
+            termsOverlay.remove();
+            termsStyle.remove();
+            showAdBlockNotice();
+          }, 300);
+        });
 
         searchInput.addEventListener('input', (e) => {
           const query = e.target.value.toLowerCase().trim();
